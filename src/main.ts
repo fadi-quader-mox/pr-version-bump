@@ -24,7 +24,7 @@ async function run(): Promise<void> {
   console.log('labels: ', labels.join(', '))
   // eslint-disable-next-line no-console
   console.log('currentVersion: ', currentVersion)
-  // console.log(JSON.stringify(pullRequest, null, 2));
+  // console.log(JSON.stringify(pullRequest, null, 2))
 }
 
 void run()
