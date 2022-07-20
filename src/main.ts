@@ -33,7 +33,7 @@ async function run(): Promise<void> {
   console.log('defaultBranchVersion: ', defaultBranchVersion)
   // eslint-disable-next-line no-console
   console.log('currentVersion: ', currentBranchVersion)
-  // console.log(JSON.stringify(pullRequest, null, 2))
+  // console.log(JSON.stringify(pullRequest, null, 2));
 }
 
 void run()
