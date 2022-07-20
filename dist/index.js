@@ -949,8 +949,15 @@ function run() {
         const octokit = github.getOctokit(GITHUB_TOKEN);
         const { context } = github;
         const pullRequest = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.pull_request;
+        const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
+        const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
+        const labels = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map(label => label === null || label === void 0 ? void 0 : label.name);
         // eslint-disable-next-line no-console
-        console.log(JSON.stringify(pullRequest, null, 2));
+        console.log('defaultBranch: ', defaultBranch);
+        // eslint-disable-next-line no-console
+        console.log('currentBranch: ', currentBranch);
+        // eslint-disable-next-line no-console
+        console.log('labels: ', labels.join(', '));
     });
 }
 void run();
