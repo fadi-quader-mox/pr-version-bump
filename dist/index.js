@@ -334,6 +334,13 @@ exports.getApiBaseUrl = getApiBaseUrl;
 
 /***/ }),
 
+/***/ 129:
+/***/ (function(module) {
+
+module.exports = require("child_process");
+
+/***/ }),
+
 /***/ 141:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -602,6 +609,61 @@ if (process.env.NODE_DEBUG && /\btunnel\b/.test(process.env.NODE_DEBUG)) {
   debug = function() {};
 }
 exports.debug = debug; // for test
+
+
+/***/ }),
+
+/***/ 152:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.WorkspaceEnv = void 0;
+const os_1 = __webpack_require__(87);
+const child_process_1 = __webpack_require__(129);
+class WorkspaceEnv {
+    constructor(workspace) {
+        this.workspace = workspace;
+    }
+    run(command, args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                const child = (0, child_process_1.spawn)(command, args, { cwd: this.workspace });
+                let isDone = false;
+                const errorMessages = [];
+                child.on('error', error => {
+                    if (!isDone) {
+                        isDone = true;
+                        reject(error);
+                    }
+                });
+                child.stderr.on('data', chunk => errorMessages.push(chunk));
+                child.on('exit', code => {
+                    if (!isDone) {
+                        if (code === 0) {
+                            void resolve(null);
+                        }
+                        else {
+                            const error = new Error(`${errorMessages.join('')}${os_1.EOL}${command} exited with code ${code}`);
+                            reject(error);
+                        }
+                    }
+                });
+            });
+        });
+    }
+}
+exports.WorkspaceEnv = WorkspaceEnv;
 
 
 /***/ }),
@@ -942,20 +1004,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const utils_1 = __webpack_require__(611);
+const WorkspaceEnv_1 = __webpack_require__(152);
 function run() {
-    var _a, _b;
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const octokit = github.getOctokit(GITHUB_TOKEN);
+        const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './';
         const { context } = github;
         const pullRequest = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.pull_request;
         const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
-        // const currentBranch = pullRequest?.head.ref
-        const currentBranch = (_b = process.env.GITHUB_REF_NAME) !== null && _b !== void 0 ? _b : '';
+        const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
+        const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
         const labels = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map(label => label === null || label === void 0 ? void 0 : label.name);
-        const currentPkg = yield (0, utils_1.getPackageJson)();
-        const currentVersion = currentPkg.version;
+        const currentPkg = yield (0, utils_1.getPackageJson)(originalGitHubWorkspace);
+        const currentBranchVersion = currentPkg.version;
+        yield workspaceEnv.run('git', ['checkout', defaultBranch]);
+        const defaultBranchPackage = yield (0, utils_1.getPackageJson)(originalGitHubWorkspace);
+        const defaultBranchVersion = defaultBranchPackage.version;
         // eslint-disable-next-line no-console
         console.log('defaultBranch: ', defaultBranch);
         // eslint-disable-next-line no-console
@@ -963,7 +1030,9 @@ function run() {
         // eslint-disable-next-line no-console
         console.log('labels: ', labels.join(', '));
         // eslint-disable-next-line no-console
-        console.log('currentVersion: ', currentVersion);
+        console.log('defaultBranchVersion: ', defaultBranchVersion);
+        // eslint-disable-next-line no-console
+        console.log('currentVersion: ', currentBranchVersion);
     });
 }
 void run();
@@ -5393,10 +5462,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPackageJson = void 0;
 const fs_1 = __webpack_require__(747);
 const path = __importStar(__webpack_require__(622));
-function getPackageJson() {
+function getPackageJson(workspace) {
     return __awaiter(this, void 0, void 0, function* () {
-        const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './';
-        const pathToPackage = path.join(originalGitHubWorkspace, 'package.json');
+        const pathToPackage = path.join(workspace, 'package.json');
         if (!(0, fs_1.existsSync)(pathToPackage))
             throw new Error("package.json could not be found in your project's root.");
         // @ts-ignore
