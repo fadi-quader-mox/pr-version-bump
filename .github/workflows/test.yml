@@ -1,0 +1,19 @@
+name: 'Bump Version'
+on:
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - labeled
+      - unlabeled
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: 'actions/checkout@v3'
+      - uses: ./
+        with:
+          GITHUB_TOKEN: ${{ github.GITHUB_TOKEN }}
+

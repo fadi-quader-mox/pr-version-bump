@@ -1,0 +1,19 @@
+name: 'Create new Semantic Version'
+description: 'Create new Semantic Version for Pull Request'
+inputs:
+  GITHUB_TOKEN:
+    description: "Github Token"
+    required: true
+#  PR_BRANCH:
+#    description: "PR Branch"
+#    required: true
+  MAIN_BRANCH:
+    description: "Main Branch"
+    required: true
+    default: 'main'
+
+runs:
+  using: node16
+
+  main: dist/index.js
+  post: dist/index.js
