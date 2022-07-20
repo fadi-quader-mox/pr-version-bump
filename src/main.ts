@@ -16,7 +16,7 @@ async function run(): Promise<void> {
   console.log('currentBranch: ', currentBranch)
   // eslint-disable-next-line no-console
   console.log('labels: ', labels.join(', '))
-  // console.log(JSON.stringify(pullRequest, null, 2))
+  // console.log(JSON.stringify(pullRequest, null, 2));
 }
 
 void run()
