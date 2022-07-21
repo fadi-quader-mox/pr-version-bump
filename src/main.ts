@@ -16,6 +16,7 @@ async function run(): Promise<void> {
   const labels: string[] =
     pullRequest?.labels.map(label => label?.name.trim()) ?? []
   const semverLabel: string = getSemverLabel(labels)
+  core.info(`Label: ${semverLabel}`)
   if (!semverLabel) {
     core.setFailed(
       `❌ Invalid version labels, please provide one of these labels: ${SEM_VERSIONS.join(
@@ -38,7 +39,6 @@ async function run(): Promise<void> {
     .replace(/^v/, '')
 
   core.debug(`newVersion: ${newVersion}`)
-  await workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`])
   await workspaceEnv.run('git', ['fetch', 'origin'])
   if (newVersion === currentBranchVersion) {
     core.info('✅ Version is already bumped! Skipping..')
@@ -64,7 +64,6 @@ async function run(): Promise<void> {
     `"chore: auto bump version to ${newVersion}"`
   ])
   core.info(`🔄 Pushing new version to branch ${currentBranch}`)
-  await workspaceEnv.run('git', ['fetch'])
   await workspaceEnv.run('git', ['push', remoteRepo])
   core.info(`✅ Version bumped to ${newVersion}`)
 }
