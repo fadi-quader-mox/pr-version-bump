@@ -3,7 +3,6 @@ import * as github from '@actions/github'
 import * as chProcess from 'child_process'
 
 import {getPackageJson, writePackageJson} from './utils'
-import {PackageJson} from './types'
 import {WorkspaceEnv} from './WorkspaceEnv'
 
 async function run(): Promise<void> {
@@ -18,7 +17,7 @@ async function run(): Promise<void> {
 
   const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
   const labels: string[] = pullRequest?.labels.map(label => label?.name)
-  const currentPkg: PackageJson = await getPackageJson(originalGitHubWorkspace)
+  const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
   const currentBranchVersion = currentPkg.version
   await workspaceEnv.run('git', ['checkout', defaultBranch])
   // eslint-disable-next-line no-console
@@ -44,7 +43,7 @@ async function run(): Promise<void> {
   await workspaceEnv.run('git', ['checkout', currentBranch])
   currentPkg.version = newVersion
   writePackageJson(originalGitHubWorkspace, currentPkg)
-  const currentPkg1: PackageJson = await getPackageJson(originalGitHubWorkspace)
+  const currentPkg1 = (await getPackageJson(originalGitHubWorkspace)) as any
   // eslint-disable-next-line no-console
   console.log('newPkgVersion: ', currentPkg1.version)
   //

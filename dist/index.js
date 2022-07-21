@@ -1019,7 +1019,7 @@ function run() {
         const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
         const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
         const labels = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map(label => label === null || label === void 0 ? void 0 : label.name);
-        const currentPkg = yield (0, utils_1.getPackageJson)(originalGitHubWorkspace);
+        const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.run('git', ['checkout', defaultBranch]);
         // eslint-disable-next-line no-console
@@ -1044,7 +1044,7 @@ function run() {
         yield workspaceEnv.run('git', ['checkout', currentBranch]);
         currentPkg.version = newVersion;
         (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
-        const currentPkg1 = yield (0, utils_1.getPackageJson)(originalGitHubWorkspace);
+        const currentPkg1 = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         // eslint-disable-next-line no-console
         console.log('newPkgVersion: ', currentPkg1.version);
     });
