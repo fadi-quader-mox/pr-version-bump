@@ -1027,7 +1027,7 @@ function run() {
         const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map(label => label === null || label === void 0 ? void 0 : label.name)) !== null && _b !== void 0 ? _b : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
         if (!semverLabel) {
-            core.setFailed(`Invalid version labels, please provide one of these labels: ${constans_1.SEM_VERSIONS.join(', ')}`);
+            core.setFailed(`❌ Invalid version labels, please provide one of these labels: ${constans_1.SEM_VERSIONS.join(', ')}`);
             return;
         }
         const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
@@ -1037,23 +1037,20 @@ function run() {
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.run('git', ['checkout', defaultBranch]);
         const newVersion = chProcess
-            .execSync(`npm version --git-tag-version=false ${'patch'}`)
+            .execSync(`npm version --git-tag-version=false ${semverLabel}`)
             .toString()
             .trim()
             .replace(/^v/, '');
         core.debug(`newVersion: ${newVersion}`);
         if (newVersion === currentBranchVersion) {
-            core.debug('Version is already bumped! Skipping..');
+            core.info('✅ Version is already bumped! Skipping..');
+            return;
         }
-        yield workspaceEnv.run('git', ['fetch']);
+        yield workspaceEnv.run('git', ['fetch', 'origin']);
+        yield workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`]);
         yield workspaceEnv.run('git', ['checkout', currentBranch]);
         currentPkg.version = newVersion;
         (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
-        yield workspaceEnv.run('git', [
-            'config',
-            'user.name',
-            `"$(git log -n 1 --pretty=format:%an)"`
-        ]);
         yield workspaceEnv.setGithubUsernameAndPassword(GITHUB_ACTOR, `${GITHUB_ACTOR}@users.noreply.github.com`);
         const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`;
         yield workspaceEnv.run('git', [
@@ -1062,9 +1059,9 @@ function run() {
             '-m',
             `"chore: auto bump version to ${newVersion}"`
         ]);
-        core.info(`Pushing new version to branch ${currentBranch}`);
+        core.info(`🔄 Pushing new version to branch ${currentBranch}`);
         yield workspaceEnv.run('git', ['push', remoteRepo]);
-        core.info(`Version bumped to ${newVersion}`);
+        core.info(`✅ Version bumped to ${newVersion}`);
     });
 }
 void run();
