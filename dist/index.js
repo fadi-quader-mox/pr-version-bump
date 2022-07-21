@@ -1042,7 +1042,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
-const chProcess = __importStar(__webpack_require__(129));
 const utils_1 = __webpack_require__(611);
 const WorkspaceEnv_1 = __webpack_require__(152);
 const constans_1 = __webpack_require__(416);
@@ -1069,15 +1068,12 @@ function run() {
         core.info(`currentBranch: ${currentBranch}`);
         core.info(`defaultBranch: ${defaultBranch}`);
         const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
+        yield workspaceEnv.checkout(currentBranch);
         yield workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only']);
         const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.checkout(defaultBranch);
-        const newVersion = chProcess
-            .execSync(`npm version --git-tag-version=false ${semverLabel}`)
-            .toString()
-            .trim()
-            .replace(/^v/, '');
+        const newVersion = (0, utils_1.generateNewVersion)(semverLabel);
         core.debug(`newVersion: ${newVersion}`);
         yield workspaceEnv.run('git', ['fetch']);
         core.info(`currentBranchVersion: ${currentBranchVersion}`);
@@ -5538,10 +5534,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSemverLabel = exports.writePackageJson = exports.getPackageJson = void 0;
+exports.generateNewVersion = exports.getSemverLabel = exports.writePackageJson = exports.getPackageJson = void 0;
 const fs_1 = __webpack_require__(747);
 const path = __importStar(__webpack_require__(622));
 const constans_1 = __webpack_require__(416);
+const child_process_1 = __webpack_require__(129);
 function getPackageJson(workspace) {
     return __awaiter(this, void 0, void 0, function* () {
         const pathToPackage = path.join(workspace, 'package.json');
@@ -5567,6 +5564,13 @@ function getSemverLabel(labels) {
     return versions[0];
 }
 exports.getSemverLabel = getSemverLabel;
+function generateNewVersion(semverLabel) {
+    return (0, child_process_1.execSync)(`npm version --git-tag-version=false ${semverLabel}`)
+        .toString()
+        .trim()
+        .replace(/^v/, '');
+}
+exports.generateNewVersion = generateNewVersion;
 
 
 /***/ }),

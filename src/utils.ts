@@ -1,6 +1,7 @@
 import {existsSync, writeFileSync} from 'fs'
 import * as path from 'path'
 import {SEM_VERSIONS} from './constans'
+import {execSync} from 'child_process'
 
 export async function getPackageJson(workspace: string): Promise<never> {
   const pathToPackage = path.join(workspace, 'package.json')
@@ -24,4 +25,11 @@ export function getSemverLabel(labels: string[]): string {
   if (versions.length !== 1) return ''
 
   return versions[0]
+}
+
+export function generateNewVersion(semverLabel): string {
+  return execSync(`npm version --git-tag-version=false ${semverLabel}`)
+    .toString()
+    .trim()
+    .replace(/^v/, '')
 }

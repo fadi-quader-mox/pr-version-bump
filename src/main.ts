@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as chProcess from 'child_process'
 
-import {getPackageJson, getSemverLabel, writePackageJson} from './utils'
+import {generateNewVersion, getPackageJson, getSemverLabel, writePackageJson} from './utils'
 import {WorkspaceEnv} from './WorkspaceEnv'
 import {SEM_VERSIONS} from './constans'
 
@@ -32,16 +32,12 @@ async function run(): Promise<void> {
   core.info(`currentBranch: ${currentBranch}`)
   core.info(`defaultBranch: ${defaultBranch}`)
   const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
+  await workspaceEnv.checkout(currentBranch)
   await workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only'])
   const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
   const currentBranchVersion = currentPkg.version
   await workspaceEnv.checkout(defaultBranch)
-  const newVersion = chProcess
-    .execSync(`npm version --git-tag-version=false ${semverLabel}`)
-    .toString()
-    .trim()
-    .replace(/^v/, '')
-
+  const newVersion = generateNewVersion(semverLabel)
   core.debug(`newVersion: ${newVersion}`)
   await workspaceEnv.run('git', ['fetch'])
   core.info(`currentBranchVersion: ${currentBranchVersion}`)
