@@ -24,10 +24,12 @@ export class WorkspaceEnv {
           if (code === 0) {
             void resolve(null)
           } else {
-            const errorMsg = `${errorMessages.join(
-              ''
-            )}${EOL}${command} exited with code ${code}`
-            reject(errorMsg)
+            const error = new Error(
+              `${errorMessages.join(
+                ''
+              )}${EOL}${command} exited with code ${code}`
+            )
+            reject(error)
           }
         }
       })

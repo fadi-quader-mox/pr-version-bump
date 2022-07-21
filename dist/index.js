@@ -654,8 +654,8 @@ class WorkspaceEnv {
                             void resolve(null);
                         }
                         else {
-                            const errorMsg = `${errorMessages.join('')}${os_1.EOL}${command} exited with code ${code}`;
-                            reject(errorMsg);
+                            const error = new Error(`${errorMessages.join('')}${os_1.EOL}${command} exited with code ${code}`);
+                            reject(error);
                         }
                     }
                 });
@@ -1044,7 +1044,7 @@ function run() {
             .replace(/^v/, '');
         core.debug(`newVersion: ${newVersion}`);
         yield workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`]);
-        yield workspaceEnv.run('git', ['fetch']);
+        yield workspaceEnv.run('git', ['fetch', 'origin']);
         if (newVersion === currentBranchVersion) {
             core.info('✅ Version is already bumped! Skipping..');
             return;
