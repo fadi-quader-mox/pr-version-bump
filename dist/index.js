@@ -1028,8 +1028,13 @@ function run() {
         console.log('currentBranch: ', currentBranch);
         // eslint-disable-next-line no-console
         console.log('labels: ', labels.join(', '));
-        const whoami = chProcess.execSync('npm whoami').toString();
-        console.log('whoami ', whoami);
+        const newVersion = chProcess
+            .execSync(`npm version --git-tag-version=false ${'patch'}`)
+            .toString()
+            .trim()
+            .replace(/^v/, '');
+        // eslint-disable-next-line no-console
+        console.log('newVersion: ', newVersion);
     });
 }
 void run();
