@@ -1043,16 +1043,16 @@ function run() {
             .replace(/^v/, '');
         core.debug(`newVersion: ${newVersion}`);
         yield workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`]);
-        yield workspaceEnv.run('git', ['fetch', 'origin']);
+        yield workspaceEnv.run('git', ['fetch']);
         if (newVersion === currentBranchVersion) {
             core.info('✅ Version is already bumped! Skipping..');
             return;
         }
         yield workspaceEnv.run('git', [
             'checkout',
-            currentBranch,
-            '--progress',
-            '--force'
+            currentBranch
+            // '--progress',
+            // '--force'
         ]);
         currentPkg.version = newVersion;
         (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);

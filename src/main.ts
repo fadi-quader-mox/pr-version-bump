@@ -39,16 +39,16 @@ async function run(): Promise<void> {
 
   core.debug(`newVersion: ${newVersion}`)
   await workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`])
-  await workspaceEnv.run('git', ['fetch', 'origin'])
+  await workspaceEnv.run('git', ['fetch'])
   if (newVersion === currentBranchVersion) {
     core.info('✅ Version is already bumped! Skipping..')
     return
   }
   await workspaceEnv.run('git', [
     'checkout',
-    currentBranch,
-    '--progress',
-    '--force'
+    currentBranch
+    // '--progress',
+    // '--force'
   ])
   currentPkg.version = newVersion
   writePackageJson(originalGitHubWorkspace, currentPkg)
