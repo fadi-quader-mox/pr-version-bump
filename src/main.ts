@@ -49,20 +49,28 @@ async function run(): Promise<void> {
   // eslint-disable-next-line no-console
   console.log('newPkgVersion: ', currentPkg1.version)
 
-  const githubUsername = await workspaceEnv.run('git', [
-    'log',
-    '-n',
-    '1',
-    '--pretty=format:%an'
+  // const githubUsername = await workspaceEnv.run('git', [
+  //   'log',
+  //   '-n',
+  //   '1',
+  //   '--pretty=format:%an'
+  // ])
+  // const githubEmail = await workspaceEnv.run('git', [
+  //   'log',
+  //   '-n',
+  //   '1',
+  //   '--pretty=format:%ae'
+  // ])
+  await workspaceEnv.run('git', [
+    'config',
+    'user.name',
+    `"$(git log -n 1 --pretty=format:%an)"`
   ])
-  const githubEmail = await workspaceEnv.run('git', [
-    'log',
-    '-n',
-    '1',
-    '--pretty=format:%ae'
+  await workspaceEnv.run('git', [
+    'config',
+    'user.email',
+    `"$(git log -n 1 --pretty=format:%ae)"`
   ])
-  await workspaceEnv.run('git', ['config', 'user.name', `"${githubUsername}"`])
-  await workspaceEnv.run('git', ['config', 'user.email', `"${githubEmail}"`])
 
   await workspaceEnv.run('git', [
     'commit',
