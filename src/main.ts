@@ -2,8 +2,9 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as chProcess from 'child_process'
 
-import {getPackageJson, writePackageJson} from './utils'
+import {getPackageJson, getSemverLabel, writePackageJson} from './utils'
 import {WorkspaceEnv} from './WorkspaceEnv'
+import {SEM_VERSIONS} from './constans'
 
 async function run(): Promise<void> {
   const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
@@ -12,11 +13,20 @@ async function run(): Promise<void> {
   const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './'
   const {context} = github
   const pullRequest = context?.payload?.pull_request
+  const labels: string[] = pullRequest?.labels.map(label => label?.name) ?? []
+  const semverLabel: string = getSemverLabel(labels)
+  if (!semverLabel) {
+    core.setFailed(
+      `Invalid version labels, please provide one of these labels: ${SEM_VERSIONS.join(
+        ', '
+      )}`
+    )
+    return
+  }
   const defaultBranch = pullRequest?.base.repo.default_branch
   const currentBranch = pullRequest?.head.ref
 
   const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
-  const labels: string[] = pullRequest?.labels.map(label => label?.name)
   const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
   const currentBranchVersion = currentPkg.version
   await workspaceEnv.run('git', ['checkout', defaultBranch])
@@ -49,7 +59,7 @@ async function run(): Promise<void> {
     'commit',
     '-a',
     '-m',
-    `"chore: bump version to ${newVersion}"`
+    `"chore: auto bump version to ${newVersion}"`
   ])
   core.info(`Pushing new version to branch ${currentBranch}`)
   await workspaceEnv.run('git', ['push', remoteRepo])

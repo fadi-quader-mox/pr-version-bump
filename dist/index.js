@@ -1014,8 +1014,9 @@ const github = __importStar(__webpack_require__(469));
 const chProcess = __importStar(__webpack_require__(129));
 const utils_1 = __webpack_require__(611);
 const WorkspaceEnv_1 = __webpack_require__(152);
+const constans_1 = __webpack_require__(416);
 function run() {
-    var _a;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
         const GITHUB_ACTOR = process.env.GITHUB_ACTOR || '';
@@ -1023,10 +1024,15 @@ function run() {
         const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './';
         const { context } = github;
         const pullRequest = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.pull_request;
+        const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map(label => label === null || label === void 0 ? void 0 : label.name)) !== null && _b !== void 0 ? _b : [];
+        const semverLabel = (0, utils_1.getSemverLabel)(labels);
+        if (!semverLabel) {
+            core.setFailed(`Invalid version labels, please provide one of these labels: ${constans_1.SEM_VERSIONS.join(', ')}`);
+            return;
+        }
         const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
         const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
         const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
-        const labels = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map(label => label === null || label === void 0 ? void 0 : label.name);
         const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.run('git', ['checkout', defaultBranch]);
@@ -1054,7 +1060,7 @@ function run() {
             'commit',
             '-a',
             '-m',
-            `"chore: bump version to ${newVersion}"`
+            `"chore: auto bump version to ${newVersion}"`
         ]);
         core.info(`Pushing new version to branch ${currentBranch}`);
         yield workspaceEnv.run('git', ['push', remoteRepo]);
@@ -1843,6 +1849,18 @@ exports.endpoint = endpoint;
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 module.exports = __webpack_require__(141);
+
+
+/***/ }),
+
+/***/ 416:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SEM_VERSIONS = void 0;
+exports.SEM_VERSIONS = ['major', 'minor', 'patch'];
 
 
 /***/ }),
@@ -5485,9 +5503,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.writePackageJson = exports.getPackageJson = void 0;
+exports.getSemverLabel = exports.writePackageJson = exports.getPackageJson = void 0;
 const fs_1 = __webpack_require__(747);
 const path = __importStar(__webpack_require__(622));
+const constans_1 = __webpack_require__(416);
 function getPackageJson(workspace) {
     return __awaiter(this, void 0, void 0, function* () {
         const pathToPackage = path.join(workspace, 'package.json');
@@ -5506,6 +5525,13 @@ function writePackageJson(workspace, newPackageJson) {
     (0, fs_1.writeFileSync)(pathToPackage, JSON.stringify(newPackageJson, null, 2));
 }
 exports.writePackageJson = writePackageJson;
+function getSemverLabel(labels) {
+    const versions = labels.filter(label => constans_1.SEM_VERSIONS.includes(label));
+    if (versions.length !== 1)
+        return '';
+    return versions[0];
+}
+exports.getSemverLabel = getSemverLabel;
 
 
 /***/ }),
