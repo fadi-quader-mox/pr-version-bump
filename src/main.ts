@@ -40,12 +40,14 @@ async function run(): Promise<void> {
   //   console.log('Version is already bumpled! Skipping..')
   // }
   //
-  // await workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`])
-  // await workspaceEnv.run('git', ['checkout', currentBranch])
+  await workspaceEnv.run('git', ['checkout', currentBranch])
   //
-  // currentPkg.version = newVersion
-  //
-  // writePackageJson(originalGitHubWorkspace, currentPkg)
+  currentPkg.version = newVersion
+
+  writePackageJson(originalGitHubWorkspace, currentPkg)
+  const currentPkg1: PackageJson = await getPackageJson(originalGitHubWorkspace)
+  // eslint-disable-next-line no-console
+  console.log('newPkgVersion: ', currentPkg1.version)
   //
   // await workspaceEnv.run('git', [
   //   'commit',

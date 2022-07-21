@@ -1035,6 +1035,18 @@ function run() {
             .replace(/^v/, '');
         // eslint-disable-next-line no-console
         console.log('newVersion: ', newVersion);
+        // if (newVersion === currentBranchVersion) {
+        //   // eslint-disable-next-line no-console
+        //   console.log('Version is already bumpled! Skipping..')
+        // }
+        //
+        yield workspaceEnv.run('git', ['checkout', currentBranch]);
+        //
+        currentPkg.version = newVersion;
+        (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
+        const currentPkg1 = yield (0, utils_1.getPackageJson)(originalGitHubWorkspace);
+        // eslint-disable-next-line no-console
+        console.log('newPkgVersion: ', currentPkg1.version);
     });
 }
 void run();
