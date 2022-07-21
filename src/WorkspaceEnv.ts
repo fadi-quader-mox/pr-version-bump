@@ -48,4 +48,8 @@ export class WorkspaceEnv {
       this.run('git', ['config', 'user.email', `"${email}"`])
     ])
   }
+
+  async checkout(ref): Promise<void> {
+    await this.run('git', ['checkout', ref, '--progress', '--force'])
+  }
 }
