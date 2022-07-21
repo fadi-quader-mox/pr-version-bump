@@ -42,6 +42,8 @@ async function run(): Promise<void> {
 
   core.debug(`newVersion: ${newVersion}`)
   await workspaceEnv.run('git', ['fetch'])
+  core.info(`currentBranchVersion: ${currentBranchVersion}`)
+  core.info(`newVersion: ${newVersion}`)
   if (newVersion === currentBranchVersion) {
     core.info('✅ Version is already bumped! Skipping..')
     return

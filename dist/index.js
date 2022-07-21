@@ -1072,6 +1072,8 @@ function run() {
             .replace(/^v/, '');
         core.debug(`newVersion: ${newVersion}`);
         yield workspaceEnv.run('git', ['fetch']);
+        core.info(`currentBranchVersion: ${currentBranchVersion}`);
+        core.info(`newVersion: ${newVersion}`);
         if (newVersion === currentBranchVersion) {
             core.info('✅ Version is already bumped! Skipping..');
             return;
