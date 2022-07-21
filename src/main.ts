@@ -56,7 +56,6 @@ async function run(): Promise<void> {
   await workspaceEnv.run('git', ['push', remoteRepo])
   // eslint-disable-next-line no-console
   console.log(`Bumped version to ${newVersion}`)
-  // console.log(JSON.stringify(pullRequest, null, 2));
 }
 
 void run()
