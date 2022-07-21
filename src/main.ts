@@ -34,29 +34,31 @@ async function run(): Promise<void> {
     .trim()
     .replace(/^v/, '')
 
+  // eslint-disable-next-line no-console
+  console.log('newVersion: ', newVersion)
   if (newVersion === currentBranchVersion) {
     // eslint-disable-next-line no-console
     console.log('Version is already bumpled! Skipping..')
   }
-
-  await workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`])
-  await workspaceEnv.run('git', ['checkout', currentBranch])
-
-  currentPkg.version = newVersion
-
-  writePackageJson(originalGitHubWorkspace, currentPkg)
-
-  await workspaceEnv.run('git', [
-    'commit',
-    '-a',
-    '-m',
-    `chore: bump version to ${newVersion}`
-  ])
-  const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`
-  await workspaceEnv.run('git', ['push', remoteRepo])
-  // eslint-disable-next-line no-console
-  console.log(`Bumped version to ${newVersion}`)
-  // console.log(JSON.stringify(pullRequest, null, 2));
+  //
+  // await workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`])
+  // await workspaceEnv.run('git', ['checkout', currentBranch])
+  //
+  // currentPkg.version = newVersion
+  //
+  // writePackageJson(originalGitHubWorkspace, currentPkg)
+  //
+  // await workspaceEnv.run('git', [
+  //   'commit',
+  //   '-a',
+  //   '-m',
+  //   `chore: bump version to ${newVersion}`
+  // ])
+  // const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`
+  // await workspaceEnv.run('git', ['push', remoteRepo])
+  // // eslint-disable-next-line no-console
+  // console.log(`Bumped version to ${newVersion}`)
+  // // console.log(JSON.stringify(pullRequest, null, 2));
 }
 
 void run()
