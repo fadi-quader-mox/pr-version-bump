@@ -34,13 +34,11 @@ async function run(): Promise<void> {
   const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
   await workspaceEnv.run('git', ['fetch'])
   await workspaceEnv.checkout(currentBranch)
-  await workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only'])
   const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
   const currentBranchVersion = currentPkg.version
   await workspaceEnv.checkout(defaultBranch)
   const newVersion = generateNewVersion(semverLabel)
   core.debug(`newVersion: ${newVersion}`)
-  await workspaceEnv.run('git', ['fetch'])
   core.info(`currentBranchVersion: ${currentBranchVersion}`)
   core.info(`newVersion: ${newVersion}`)
   if (newVersion === currentBranchVersion) {

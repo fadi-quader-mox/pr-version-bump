@@ -1070,13 +1070,11 @@ function run() {
         const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
         yield workspaceEnv.run('git', ['fetch']);
         yield workspaceEnv.checkout(currentBranch);
-        yield workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only']);
         const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.checkout(defaultBranch);
         const newVersion = (0, utils_1.generateNewVersion)(semverLabel);
         core.debug(`newVersion: ${newVersion}`);
-        yield workspaceEnv.run('git', ['fetch']);
         core.info(`currentBranchVersion: ${currentBranchVersion}`);
         core.info(`newVersion: ${newVersion}`);
         if (newVersion === currentBranchVersion) {
