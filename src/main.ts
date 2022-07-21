@@ -42,13 +42,11 @@ async function run(): Promise<void> {
   //
   await workspaceEnv.run('git', ['fetch'])
   await workspaceEnv.run('git', ['checkout', currentBranch])
-  //
-  // currentPkg.version = newVersion
-  //
-  // writePackageJson(originalGitHubWorkspace, currentPkg)
-  // const currentPkg1: PackageJson = await getPackageJson(originalGitHubWorkspace)
-  // // eslint-disable-next-line no-console
-  // console.log('newPkgVersion: ', currentPkg1.version)
+  currentPkg.version = newVersion
+  writePackageJson(originalGitHubWorkspace, currentPkg)
+  const currentPkg1: PackageJson = await getPackageJson(originalGitHubWorkspace)
+  // eslint-disable-next-line no-console
+  console.log('newPkgVersion: ', currentPkg1.version)
   //
   // await workspaceEnv.run('git', [
   //   'commit',

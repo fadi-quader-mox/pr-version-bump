@@ -1042,6 +1042,11 @@ function run() {
         //
         yield workspaceEnv.run('git', ['fetch']);
         yield workspaceEnv.run('git', ['checkout', currentBranch]);
+        currentPkg.version = newVersion;
+        (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
+        const currentPkg1 = yield (0, utils_1.getPackageJson)(originalGitHubWorkspace);
+        // eslint-disable-next-line no-console
+        console.log('newPkgVersion: ', currentPkg1.version);
     });
 }
 void run();
