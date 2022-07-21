@@ -31,9 +31,9 @@ async function run(): Promise<void> {
     return
   }
   const defaultBranch = pullRequest?.base.repo.default_branch
-  core.debug(`defaultBranch: ${defaultBranch}`)
+  core.debug(`Main branch: ${defaultBranch}`)
   const currentBranch = pullRequest?.head.ref
-  core.debug(`currentBranch: ${currentBranch}`)
+  core.debug(`Current branch: ${currentBranch}`)
   const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
   await workspaceEnv.run('git', ['fetch'])
   await workspaceEnv.checkout(currentBranch)
@@ -57,9 +57,9 @@ async function run(): Promise<void> {
   )
   const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`
   await workspaceEnv.commit(`(chore): auto bump version to ${newVersion}`)
-  core.info(`🔄 Pushing new version to branch ${currentBranch}`)
+  core.info(`🔄 Pushing a new version to branch ${currentBranch}..`)
   await workspaceEnv.run('git', ['push', remoteRepo])
-  core.info(`✅ Version bumped to ${newVersion}`)
+  core.info(`✅ Version bumped to ${newVersion} for this PR.`)
 }
 
 void run()

@@ -1069,9 +1069,9 @@ function run() {
             return;
         }
         const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
-        core.debug(`defaultBranch: ${defaultBranch}`);
+        core.debug(`Main branch: ${defaultBranch}`);
         const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
-        core.debug(`currentBranch: ${currentBranch}`);
+        core.debug(`Current branch: ${currentBranch}`);
         const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
         yield workspaceEnv.run('git', ['fetch']);
         yield workspaceEnv.checkout(currentBranch);
@@ -1091,9 +1091,9 @@ function run() {
         yield workspaceEnv.setGithubUsernameAndPassword(GITHUB_ACTOR, `${GITHUB_ACTOR}@users.noreply.github.com`);
         const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`;
         yield workspaceEnv.commit(`(chore): auto bump version to ${newVersion}`);
-        core.info(`🔄 Pushing new version to branch ${currentBranch}`);
+        core.info(`🔄 Pushing a new version to branch ${currentBranch}..`);
         yield workspaceEnv.run('git', ['push', remoteRepo]);
-        core.info(`✅ Version bumped to ${newVersion}`);
+        core.info(`✅ Version bumped to ${newVersion} for this PR.`);
     });
 }
 void run();
