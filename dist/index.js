@@ -1033,24 +1033,12 @@ function run() {
             .toString()
             .trim()
             .replace(/^v/, '');
+        // eslint-disable-next-line no-console
+        console.log('newVersion: ', newVersion);
         if (newVersion === currentBranchVersion) {
             // eslint-disable-next-line no-console
             console.log('Version is already bumpled! Skipping..');
         }
-        yield workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`]);
-        yield workspaceEnv.run('git', ['checkout', currentBranch]);
-        currentPkg.version = newVersion;
-        (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
-        yield workspaceEnv.run('git', [
-            'commit',
-            '-a',
-            '-m',
-            `chore: bump version to ${newVersion}`
-        ]);
-        const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
-        yield workspaceEnv.run('git', ['push', remoteRepo]);
-        // eslint-disable-next-line no-console
-        console.log(`Bumped version to ${newVersion}`);
     });
 }
 void run();
