@@ -1042,13 +1042,18 @@ function run() {
             .trim()
             .replace(/^v/, '');
         core.debug(`newVersion: ${newVersion}`);
+        yield workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`]);
+        yield workspaceEnv.run('git', ['fetch', 'origin']);
         if (newVersion === currentBranchVersion) {
             core.info('✅ Version is already bumped! Skipping..');
             return;
         }
-        yield workspaceEnv.run('git', ['fetch', 'origin']);
-        yield workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`]);
-        yield workspaceEnv.run('git', ['checkout', currentBranch]);
+        yield workspaceEnv.run('git', [
+            'checkout',
+            currentBranch,
+            '--progress',
+            '--force'
+        ]);
         currentPkg.version = newVersion;
         (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
         yield workspaceEnv.setGithubUsernameAndPassword(GITHUB_ACTOR, `${GITHUB_ACTOR}@users.noreply.github.com`);
