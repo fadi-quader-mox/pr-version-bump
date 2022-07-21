@@ -1,3 +1,4 @@
+import * as core from '@actions/core'
 import {EOL} from 'os'
 import {spawn} from 'child_process'
 
@@ -13,6 +14,7 @@ export class WorkspaceEnv {
       let isDone = false
       const errorMessages: any[] = []
       child.on('error', error => {
+        core.error(error)
         if (!isDone) {
           isDone = true
           reject(error)
