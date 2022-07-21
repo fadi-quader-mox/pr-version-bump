@@ -1035,11 +1035,10 @@ function run() {
             .replace(/^v/, '');
         // eslint-disable-next-line no-console
         console.log('newVersion: ', newVersion);
-        // if (newVersion === currentBranchVersion) {
-        //   // eslint-disable-next-line no-console
-        //   console.log('Version is already bumpled! Skipping..')
-        // }
-        //
+        if (newVersion === currentBranchVersion) {
+            // eslint-disable-next-line no-console
+            console.log('Version is already bumpled! Skipping..');
+        }
         yield workspaceEnv.run('git', ['fetch']);
         yield workspaceEnv.run('git', ['checkout', currentBranch]);
         currentPkg.version = newVersion;
@@ -1047,6 +1046,14 @@ function run() {
         const currentPkg1 = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         // eslint-disable-next-line no-console
         console.log('newPkgVersion: ', currentPkg1.version);
+        yield workspaceEnv.run('git', [
+            'commit',
+            '-a',
+            '-m',
+            `chore: bump version to ${newVersion}`
+        ]);
+        const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
+        yield workspaceEnv.run('git', ['push', remoteRepo]);
     });
 }
 void run();
@@ -5482,7 +5489,6 @@ function getPackageJson(workspace) {
         if (!(0, fs_1.existsSync)(pathToPackage))
             throw new Error("package.json could not be found in your project's root.");
         // @ts-ignore
-        // return import(pathToPackage, {assert: {type: 'json'}})
         // eslint-disable-next-line @typescript-eslint/no-require-imports,import/no-dynamic-require
         return require(pathToPackage);
     });

@@ -7,7 +7,6 @@ export async function getPackageJson(workspace: string): Promise<never> {
     throw new Error("package.json could not be found in your project's root.")
 
   // @ts-ignore
-  // return import(pathToPackage, {assert: {type: 'json'}})
   // eslint-disable-next-line @typescript-eslint/no-require-imports,import/no-dynamic-require
   return require(pathToPackage)
 }
