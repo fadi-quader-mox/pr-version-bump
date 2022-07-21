@@ -52,4 +52,8 @@ export class WorkspaceEnv {
   async checkout(ref): Promise<void> {
     await this.run('git', ['checkout', ref, '--progress', '--force'])
   }
+
+  async commit(msg: string): Promise<void> {
+    await this.run('git', ['commit', '-a', '-m', `${msg}`])
+  }
 }

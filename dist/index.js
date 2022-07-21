@@ -701,6 +701,11 @@ class WorkspaceEnv {
             yield this.run('git', ['checkout', ref, '--progress', '--force']);
         });
     }
+    commit(msg) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.run('git', ['commit', '-a', '-m', `${msg}`]);
+        });
+    }
 }
 exports.WorkspaceEnv = WorkspaceEnv;
 
@@ -1074,11 +1079,10 @@ function run() {
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.checkout(defaultBranch);
         const newVersion = (0, utils_1.generateNewVersion)(semverLabel);
-        core.debug(`newVersion: ${newVersion}`);
-        core.info(`currentBranchVersion: ${currentBranchVersion}`);
-        core.info(`newVersion: ${newVersion}`);
+        core.info(`Current version: ${currentBranchVersion}`);
+        core.info(`New version: ${newVersion}`);
         if (newVersion === currentBranchVersion) {
-            core.info('✅ Version is already bumped! Skipping..');
+            core.info('✅ Version is already bumped! No action needed..');
             return;
         }
         yield workspaceEnv.checkout(currentBranch);
@@ -1086,12 +1090,7 @@ function run() {
         (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
         yield workspaceEnv.setGithubUsernameAndPassword(GITHUB_ACTOR, `${GITHUB_ACTOR}@users.noreply.github.com`);
         const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`;
-        yield workspaceEnv.run('git', [
-            'commit',
-            '-a',
-            '-m',
-            `"chore: auto bump version to ${newVersion}"`
-        ]);
+        yield workspaceEnv.commit(`(chore): auto bump version to ${newVersion}`);
         core.info(`🔄 Pushing new version to branch ${currentBranch}`);
         yield workspaceEnv.run('git', ['push', remoteRepo]);
         core.info(`✅ Version bumped to ${newVersion}`);

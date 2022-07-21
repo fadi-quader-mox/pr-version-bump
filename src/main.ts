@@ -1,8 +1,11 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import * as chProcess from 'child_process'
-
-import {generateNewVersion, getPackageJson, getSemverLabel, writePackageJson} from './utils'
+import {
+  generateNewVersion,
+  getPackageJson,
+  getSemverLabel,
+  writePackageJson
+} from './utils'
 import {WorkspaceEnv} from './WorkspaceEnv'
 import {SEM_VERSIONS} from './constans'
 
@@ -38,13 +41,13 @@ async function run(): Promise<void> {
   const currentBranchVersion = currentPkg.version
   await workspaceEnv.checkout(defaultBranch)
   const newVersion = generateNewVersion(semverLabel)
-  core.debug(`newVersion: ${newVersion}`)
-  core.info(`currentBranchVersion: ${currentBranchVersion}`)
-  core.info(`newVersion: ${newVersion}`)
+  core.info(`Current version: ${currentBranchVersion}`)
+  core.info(`New version: ${newVersion}`)
   if (newVersion === currentBranchVersion) {
-    core.info('✅ Version is already bumped! Skipping..')
+    core.info('✅ Version is already bumped! No action needed..')
     return
   }
+
   await workspaceEnv.checkout(currentBranch)
   currentPkg.version = newVersion
   writePackageJson(originalGitHubWorkspace, currentPkg)
@@ -53,12 +56,7 @@ async function run(): Promise<void> {
     `${GITHUB_ACTOR}@users.noreply.github.com`
   )
   const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`
-  await workspaceEnv.run('git', [
-    'commit',
-    '-a',
-    '-m',
-    `"chore: auto bump version to ${newVersion}"`
-  ])
+  await workspaceEnv.commit(`(chore): auto bump version to ${newVersion}`)
   core.info(`🔄 Pushing new version to branch ${currentBranch}`)
   await workspaceEnv.run('git', ['push', remoteRepo])
   core.info(`✅ Version bumped to ${newVersion}`)
