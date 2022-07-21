@@ -1049,11 +1049,15 @@ function run() {
         // eslint-disable-next-line no-console
         console.log('newPkgVersion: ', currentPkg1.version);
         const githubUsername = yield workspaceEnv.run('git', [
-            'log -n 1',
+            'log',
+            '-n',
+            '1',
             '--pretty=format:%an'
         ]);
         const githubEmail = yield workspaceEnv.run('git', [
-            'log -n 1',
+            'log',
+            '-n',
+            '1',
             '--pretty=format:%ae'
         ]);
         yield workspaceEnv.run('git', ['config', 'user.name', `"${githubUsername}"`]);
