@@ -5482,7 +5482,9 @@ function getPackageJson(workspace) {
         if (!(0, fs_1.existsSync)(pathToPackage))
             throw new Error("package.json could not be found in your project's root.");
         // @ts-ignore
-        return Promise.resolve().then(() => __importStar(require(pathToPackage)));
+        // return import(pathToPackage, {assert: {type: 'json'}})
+        // eslint-disable-next-line @typescript-eslint/no-require-imports,import/no-dynamic-require
+        return require(pathToPackage);
     });
 }
 exports.getPackageJson = getPackageJson;
