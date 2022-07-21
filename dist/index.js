@@ -1048,20 +1048,28 @@ function run() {
         const currentPkg1 = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         // eslint-disable-next-line no-console
         console.log('newPkgVersion: ', currentPkg1.version);
-        const githubUsername = yield workspaceEnv.run('git', [
-            'log',
-            '-n',
-            '1',
-            '--pretty=format:%an'
+        // const githubUsername = await workspaceEnv.run('git', [
+        //   'log',
+        //   '-n',
+        //   '1',
+        //   '--pretty=format:%an'
+        // ])
+        // const githubEmail = await workspaceEnv.run('git', [
+        //   'log',
+        //   '-n',
+        //   '1',
+        //   '--pretty=format:%ae'
+        // ])
+        yield workspaceEnv.run('git', [
+            'config',
+            'user.name',
+            `"$(git log -n 1 --pretty=format:%an)"`
         ]);
-        const githubEmail = yield workspaceEnv.run('git', [
-            'log',
-            '-n',
-            '1',
-            '--pretty=format:%ae'
+        yield workspaceEnv.run('git', [
+            'config',
+            'user.email',
+            `"$(git log -n 1 --pretty=format:%ae)"`
         ]);
-        yield workspaceEnv.run('git', ['config', 'user.name', `"${githubUsername}"`]);
-        yield workspaceEnv.run('git', ['config', 'user.email', `"${githubEmail}"`]);
         yield workspaceEnv.run('git', [
             'commit',
             '-a',
