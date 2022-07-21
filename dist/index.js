@@ -662,6 +662,22 @@ class WorkspaceEnv {
             });
         });
     }
+    setGithubCreds() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield Promise.all([
+                this.run('git', [
+                    'config',
+                    'user.name',
+                    `"$(git log -n 1 --pretty=format:%an)"`
+                ]),
+                this.run('git', [
+                    'config',
+                    'user.email',
+                    `"$(git log -n 1 --pretty=format:%ae)"`
+                ])
+            ]);
+        });
+    }
 }
 exports.WorkspaceEnv = WorkspaceEnv;
 
@@ -1024,12 +1040,6 @@ function run() {
         const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.run('git', ['checkout', defaultBranch]);
-        // eslint-disable-next-line no-console
-        console.log('defaultBranch: ', defaultBranch);
-        // eslint-disable-next-line no-console
-        console.log('currentBranch: ', currentBranch);
-        // eslint-disable-next-line no-console
-        console.log('labels: ', labels.join(', '));
         const newVersion = chProcess
             .execSync(`npm version --git-tag-version=false ${'patch'}`)
             .toString()
@@ -1048,36 +1058,22 @@ function run() {
         const currentPkg1 = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         // eslint-disable-next-line no-console
         console.log('newPkgVersion: ', currentPkg1.version);
-        // const githubUsername = await workspaceEnv.run('git', [
-        //   'log',
-        //   '-n',
-        //   '1',
-        //   '--pretty=format:%an'
-        // ])
-        // const githubEmail = await workspaceEnv.run('git', [
-        //   'log',
-        //   '-n',
-        //   '1',
-        //   '--pretty=format:%ae'
-        // ])
         yield workspaceEnv.run('git', [
             'config',
             'user.name',
             `"$(git log -n 1 --pretty=format:%an)"`
         ]);
-        yield workspaceEnv.run('git', [
-            'config',
-            'user.email',
-            `"$(git log -n 1 --pretty=format:%ae)"`
-        ]);
+        yield workspaceEnv.setGithubCreds();
+        const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`;
         yield workspaceEnv.run('git', [
             'commit',
             '-a',
             '-m',
-            `chore: bump version to ${newVersion}`
+            `"chore: bump version to ${newVersion}"`
         ]);
-        const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`;
         yield workspaceEnv.run('git', ['push', remoteRepo]);
+        // eslint-disable-next-line no-console
+        console.log(`Bumped version to ${newVersion}`);
     });
 }
 void run();

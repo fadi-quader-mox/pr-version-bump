@@ -35,4 +35,19 @@ export class WorkspaceEnv {
       })
     })
   }
+
+  async setGithubCreds(): Promise<void> {
+    await Promise.all([
+      this.run('git', [
+        'config',
+        'user.name',
+        `"$(git log -n 1 --pretty=format:%an)"`
+      ]),
+      this.run('git', [
+        'config',
+        'user.email',
+        `"$(git log -n 1 --pretty=format:%ae)"`
+      ])
+    ])
+  }
 }

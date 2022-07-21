@@ -22,12 +22,6 @@ async function run(): Promise<void> {
   const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
   const currentBranchVersion = currentPkg.version
   await workspaceEnv.run('git', ['checkout', defaultBranch])
-  // eslint-disable-next-line no-console
-  console.log('defaultBranch: ', defaultBranch)
-  // eslint-disable-next-line no-console
-  console.log('currentBranch: ', currentBranch)
-  // eslint-disable-next-line no-console
-  console.log('labels: ', labels.join(', '))
   const newVersion = chProcess
     .execSync(`npm version --git-tag-version=false ${'patch'}`)
     .toString()
@@ -48,41 +42,22 @@ async function run(): Promise<void> {
   const currentPkg1 = (await getPackageJson(originalGitHubWorkspace)) as any
   // eslint-disable-next-line no-console
   console.log('newPkgVersion: ', currentPkg1.version)
-
-  // const githubUsername = await workspaceEnv.run('git', [
-  //   'log',
-  //   '-n',
-  //   '1',
-  //   '--pretty=format:%an'
-  // ])
-  // const githubEmail = await workspaceEnv.run('git', [
-  //   'log',
-  //   '-n',
-  //   '1',
-  //   '--pretty=format:%ae'
-  // ])
   await workspaceEnv.run('git', [
     'config',
     'user.name',
     `"$(git log -n 1 --pretty=format:%an)"`
   ])
-  await workspaceEnv.run('git', [
-    'config',
-    'user.email',
-    `"$(git log -n 1 --pretty=format:%ae)"`
-  ])
-
+  await workspaceEnv.setGithubCreds()
+  const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`
   await workspaceEnv.run('git', [
     'commit',
     '-a',
     '-m',
-    `chore: bump version to ${newVersion}`
+    `"chore: bump version to ${newVersion}"`
   ])
-  const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`
   await workspaceEnv.run('git', ['push', remoteRepo])
-  // // eslint-disable-next-line no-console
-  // console.log(`Bumped version to ${newVersion}`)
-  // // console.log(JSON.stringify(pullRequest, null, 2));
+  // eslint-disable-next-line no-console
+  console.log(`Bumped version to ${newVersion}`)
 }
 
 void run()
