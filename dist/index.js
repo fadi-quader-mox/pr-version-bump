@@ -1059,9 +1059,12 @@ function run() {
             core.setFailed(`❌ Invalid version labels, please provide one of these labels: ${constans_1.SEM_VERSIONS.join(', ')}`);
             return;
         }
+        const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
+        // await workspaceEnv.run('git', ['pull', '--f'])
         const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
         const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
-        const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
+        core.info(`currentBranch: ${currentBranch}`);
+        core.info(`defaultBranch: ${defaultBranch}`);
         const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.run('git', ['checkout', defaultBranch]);

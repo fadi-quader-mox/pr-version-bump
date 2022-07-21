@@ -1,3 +1,4 @@
+git checkout main
 git pull origin main
 yarn build
 git add -A
