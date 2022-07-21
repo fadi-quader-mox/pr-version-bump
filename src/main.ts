@@ -13,7 +13,8 @@ async function run(): Promise<void> {
   const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './'
   const {context} = github
   const pullRequest = context?.payload?.pull_request
-  const labels: string[] = pullRequest?.labels.map(label => label?.name) ?? []
+  const labels: string[] =
+    pullRequest?.labels.map(label => label?.name.trim()) ?? []
   const semverLabel: string = getSemverLabel(labels)
   if (!semverLabel) {
     core.setFailed(
