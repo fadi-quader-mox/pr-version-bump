@@ -1064,7 +1064,7 @@ function run() {
         core.info(`currentBranch: ${currentBranch}`);
         core.info(`defaultBranch: ${defaultBranch}`);
         const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
-        yield workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--f']);
+        yield workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only']);
         const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.run('git', ['checkout', defaultBranch]);
