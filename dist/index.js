@@ -1024,8 +1024,11 @@ function run() {
         const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './';
         const { context } = github;
         const pullRequest = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.pull_request;
+        if (!pullRequest)
+            return;
         const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map(label => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
+        core.info(`semver ${semverLabel}`);
         if (!semverLabel) {
             core.setFailed(`❌ Invalid version labels, please provide one of these labels: ${constans_1.SEM_VERSIONS.join(', ')}`);
             return;
@@ -1048,12 +1051,7 @@ function run() {
             core.info('✅ Version is already bumped! Skipping..');
             return;
         }
-        yield workspaceEnv.run('git', [
-            'checkout',
-            currentBranch
-            // '--progress',
-            // '--force'
-        ]);
+        yield workspaceEnv.run('git', ['checkout', currentBranch]);
         currentPkg.version = newVersion;
         (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
         yield workspaceEnv.setGithubUsernameAndPassword(GITHUB_ACTOR, `${GITHUB_ACTOR}@users.noreply.github.com`);

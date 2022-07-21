@@ -13,9 +13,12 @@ async function run(): Promise<void> {
   const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './'
   const {context} = github
   const pullRequest = context?.payload?.pull_request
+  if (!pullRequest) return
+
   const labels: string[] =
     pullRequest?.labels.map(label => label?.name.trim()) ?? []
   const semverLabel: string = getSemverLabel(labels)
+  core.info(`semver ${semverLabel}`)
   if (!semverLabel) {
     core.setFailed(
       `❌ Invalid version labels, please provide one of these labels: ${SEM_VERSIONS.join(
@@ -44,12 +47,7 @@ async function run(): Promise<void> {
     core.info('✅ Version is already bumped! Skipping..')
     return
   }
-  await workspaceEnv.run('git', [
-    'checkout',
-    currentBranch
-    // '--progress',
-    // '--force'
-  ])
+  await workspaceEnv.run('git', ['checkout', currentBranch])
   currentPkg.version = newVersion
   writePackageJson(originalGitHubWorkspace, currentPkg)
   await workspaceEnv.setGithubUsernameAndPassword(
