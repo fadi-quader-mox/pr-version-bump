@@ -26,6 +26,7 @@ export class WorkspaceEnv {
           if (code === 0) {
             void resolve(null)
           } else {
+            core.error(`${command} ${args.join(', ')}`)
             const error = new Error(
               `${errorMessages.join(
                 ''

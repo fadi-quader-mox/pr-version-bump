@@ -679,6 +679,7 @@ class WorkspaceEnv {
                             void resolve(null);
                         }
                         else {
+                            core.error(`${command} ${args.join(', ')}`);
                             const error = new Error(`${errorMessages.join('')}${os_1.EOL}${command} exited with code ${code}`);
                             reject(error);
                         }
