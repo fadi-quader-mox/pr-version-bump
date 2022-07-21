@@ -1069,12 +1069,11 @@ function run() {
             return;
         }
         const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
+        core.debug(`defaultBranch: ${defaultBranch}`);
         const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
-        core.info(`currentBranch: ${currentBranch}`);
-        core.info(`defaultBranch: ${defaultBranch}`);
+        core.debug(`currentBranch: ${currentBranch}`);
         const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
         yield workspaceEnv.run('git', ['fetch']);
-        yield workspaceEnv.checkout(currentBranch);
         const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.checkout(defaultBranch);

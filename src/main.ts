@@ -31,12 +31,11 @@ async function run(): Promise<void> {
     return
   }
   const defaultBranch = pullRequest?.base.repo.default_branch
+  core.debug(`defaultBranch: ${defaultBranch}`)
   const currentBranch = pullRequest?.head.ref
-  core.info(`currentBranch: ${currentBranch}`)
-  core.info(`defaultBranch: ${defaultBranch}`)
+  core.debug(`currentBranch: ${currentBranch}`)
   const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
   await workspaceEnv.run('git', ['fetch'])
-  await workspaceEnv.checkout(currentBranch)
   const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
   const currentBranchVersion = currentPkg.version
   await workspaceEnv.checkout(defaultBranch)
