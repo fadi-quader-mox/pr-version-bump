@@ -9,8 +9,6 @@ async function run(): Promise<void> {
   const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
   const GITHUB_ACTOR = process.env.GITHUB_ACTOR || ''
   const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || ''
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const octokit = github.getOctokit(GITHUB_TOKEN)
   const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './'
   const {context} = github
   const pullRequest = context?.payload?.pull_request
@@ -28,26 +26,24 @@ async function run(): Promise<void> {
     .trim()
     .replace(/^v/, '')
 
-  // eslint-disable-next-line no-console
-  console.log('newVersion: ', newVersion)
+  core.debug(`newVersion: ${newVersion}`)
   if (newVersion === currentBranchVersion) {
-    // eslint-disable-next-line no-console
-    console.log('Version is already bumpled! Skipping..')
+    core.debug('Version is already bumped! Skipping..')
   }
 
   await workspaceEnv.run('git', ['fetch'])
   await workspaceEnv.run('git', ['checkout', currentBranch])
   currentPkg.version = newVersion
   writePackageJson(originalGitHubWorkspace, currentPkg)
-  const currentPkg1 = (await getPackageJson(originalGitHubWorkspace)) as any
-  // eslint-disable-next-line no-console
-  console.log('newPkgVersion: ', currentPkg1.version)
   await workspaceEnv.run('git', [
     'config',
     'user.name',
     `"$(git log -n 1 --pretty=format:%an)"`
   ])
-  await workspaceEnv.setGithubCreds()
+  await workspaceEnv.setGithubUsernameAndPassword(
+    GITHUB_ACTOR,
+    `${GITHUB_ACTOR}@users.noreply.github.com`
+  )
   const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`
   await workspaceEnv.run('git', [
     'commit',
@@ -55,9 +51,9 @@ async function run(): Promise<void> {
     '-m',
     `"chore: bump version to ${newVersion}"`
   ])
+  core.info(`Pushing new version to branch ${currentBranch}`)
   await workspaceEnv.run('git', ['push', remoteRepo])
-  // eslint-disable-next-line no-console
-  console.log(`Bumped version to ${newVersion}`)
+  core.info(`Version bumped to ${newVersion}`)
 }
 
 void run()

@@ -36,18 +36,13 @@ export class WorkspaceEnv {
     })
   }
 
-  async setGithubCreds(): Promise<void> {
+  async setGithubUsernameAndPassword(
+    username: string,
+    email: string
+  ): Promise<void> {
     await Promise.all([
-      this.run('git', [
-        'config',
-        'user.name',
-        `"$(git log -n 1 --pretty=format:%an)"`
-      ]),
-      this.run('git', [
-        'config',
-        'user.email',
-        `"$(git log -n 1 --pretty=format:%ae)"`
-      ])
+      this.run('git', ['config', 'user.name', `"${username}"`]),
+      this.run('git', ['config', 'user.email', `"${email}"`])
     ])
   }
 }
