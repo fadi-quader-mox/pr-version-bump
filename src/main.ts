@@ -1,6 +1,8 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import {getPackageJson} from './utils'
+import * as chProcess from 'child_process'
+
+import {getPackageJson, writePackageJson} from './utils'
 import {PackageJson} from './types'
 import {WorkspaceEnv} from './WorkspaceEnv'
 
@@ -19,20 +21,41 @@ async function run(): Promise<void> {
   const currentPkg: PackageJson = await getPackageJson(originalGitHubWorkspace)
   const currentBranchVersion = currentPkg.version
   await workspaceEnv.run('git', ['checkout', defaultBranch])
-  const defaultBranchPackage: PackageJson = await getPackageJson(
-    originalGitHubWorkspace
-  )
-  const defaultBranchVersion = defaultBranchPackage.version
   // eslint-disable-next-line no-console
   console.log('defaultBranch: ', defaultBranch)
   // eslint-disable-next-line no-console
   console.log('currentBranch: ', currentBranch)
   // eslint-disable-next-line no-console
   console.log('labels: ', labels.join(', '))
+
+  const newVersion = chProcess
+    .execSync(`npm version --git-tag-version=false ${'patch'}`)
+    .toString()
+    .trim()
+    .replace(/^v/, '')
+
+  if (newVersion === currentBranchVersion) {
+    // eslint-disable-next-line no-console
+    console.log('Version is already bumpled! Skipping..')
+  }
+
+  await workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`])
+  await workspaceEnv.run('git', ['checkout', currentBranch])
+
+  currentPkg.version = newVersion
+
+  writePackageJson(originalGitHubWorkspace, currentPkg)
+
+  await workspaceEnv.run('git', [
+    'commit',
+    '-a',
+    '-m',
+    `chore: bump version to ${newVersion}`
+  ])
+  const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`
+  await workspaceEnv.run('git', ['push', remoteRepo])
   // eslint-disable-next-line no-console
-  console.log('defaultBranchVersion: ', defaultBranchVersion)
-  // eslint-disable-next-line no-console
-  console.log('currentVersion: ', currentBranchVersion)
+  console.log(`Bumped version to ${newVersion}`)
   // console.log(JSON.stringify(pullRequest, null, 2));
 }
 

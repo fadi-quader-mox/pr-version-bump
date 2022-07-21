@@ -1003,6 +1003,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
+const chProcess = __importStar(__webpack_require__(129));
 const utils_1 = __webpack_require__(611);
 const WorkspaceEnv_1 = __webpack_require__(152);
 function run() {
@@ -1021,18 +1022,35 @@ function run() {
         const currentPkg = yield (0, utils_1.getPackageJson)(originalGitHubWorkspace);
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.run('git', ['checkout', defaultBranch]);
-        const defaultBranchPackage = yield (0, utils_1.getPackageJson)(originalGitHubWorkspace);
-        const defaultBranchVersion = defaultBranchPackage.version;
         // eslint-disable-next-line no-console
         console.log('defaultBranch: ', defaultBranch);
         // eslint-disable-next-line no-console
         console.log('currentBranch: ', currentBranch);
         // eslint-disable-next-line no-console
         console.log('labels: ', labels.join(', '));
+        const newVersion = chProcess
+            .execSync(`npm version --git-tag-version=false ${'patch'}`)
+            .toString()
+            .trim()
+            .replace(/^v/, '');
+        if (newVersion === currentBranchVersion) {
+            // eslint-disable-next-line no-console
+            console.log('Version is already bumpled! Skipping..');
+        }
+        yield workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`]);
+        yield workspaceEnv.run('git', ['checkout', currentBranch]);
+        currentPkg.version = newVersion;
+        (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
+        yield workspaceEnv.run('git', [
+            'commit',
+            '-a',
+            '-m',
+            `chore: bump version to ${newVersion}`
+        ]);
+        const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
+        yield workspaceEnv.run('git', ['push', remoteRepo]);
         // eslint-disable-next-line no-console
-        console.log('defaultBranchVersion: ', defaultBranchVersion);
-        // eslint-disable-next-line no-console
-        console.log('currentVersion: ', currentBranchVersion);
+        console.log(`Bumped version to ${newVersion}`);
     });
 }
 void run();
@@ -5459,7 +5477,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPackageJson = void 0;
+exports.writePackageJson = exports.getPackageJson = void 0;
 const fs_1 = __webpack_require__(747);
 const path = __importStar(__webpack_require__(622));
 function getPackageJson(workspace) {
@@ -5472,6 +5490,13 @@ function getPackageJson(workspace) {
     });
 }
 exports.getPackageJson = getPackageJson;
+function writePackageJson(workspace, newPackageJson) {
+    const pathToPackage = path.join(workspace, 'package.json');
+    if (!(0, fs_1.existsSync)(pathToPackage))
+        throw new Error("package.json could not be found in your project's root.");
+    (0, fs_1.writeFileSync)(pathToPackage, JSON.stringify(newPackageJson, null, 2));
+}
+exports.writePackageJson = writePackageJson;
 
 
 /***/ }),
