@@ -1072,7 +1072,7 @@ function run() {
         yield workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only']);
         const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
-        yield workspaceEnv.run('git', ['checkout', defaultBranch]);
+        yield workspaceEnv.checkout(defaultBranch);
         const newVersion = chProcess
             .execSync(`npm version --git-tag-version=false ${semverLabel}`)
             .toString()
@@ -1086,12 +1086,7 @@ function run() {
             core.info('✅ Version is already bumped! Skipping..');
             return;
         }
-        yield workspaceEnv.run('git', [
-            'checkout',
-            currentBranch,
-            '--progress',
-            '--force'
-        ]);
+        yield workspaceEnv.checkout(currentBranch);
         currentPkg.version = newVersion;
         (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
         yield workspaceEnv.setGithubUsernameAndPassword(GITHUB_ACTOR, `${GITHUB_ACTOR}@users.noreply.github.com`);

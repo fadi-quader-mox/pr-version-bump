@@ -35,7 +35,7 @@ async function run(): Promise<void> {
   await workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only'])
   const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
   const currentBranchVersion = currentPkg.version
-  await workspaceEnv.run('git', ['checkout', defaultBranch])
+  await workspaceEnv.checkout(defaultBranch)
   const newVersion = chProcess
     .execSync(`npm version --git-tag-version=false ${semverLabel}`)
     .toString()
@@ -50,12 +50,7 @@ async function run(): Promise<void> {
     core.info('✅ Version is already bumped! Skipping..')
     return
   }
-  await workspaceEnv.run('git', [
-    'checkout',
-    currentBranch,
-    '--progress',
-    '--force'
-  ])
+  await workspaceEnv.checkout(currentBranch)
   currentPkg.version = newVersion
   writePackageJson(originalGitHubWorkspace, currentPkg)
   await workspaceEnv.setGithubUsernameAndPassword(
