@@ -9,7 +9,7 @@ import {WorkspaceEnv} from './WorkspaceEnv'
 async function run(): Promise<void> {
   const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const octokit = github.getOctokit(GITHUB_TOKEN)
+  // const octokit = github.getOctokit(GITHUB_TOKEN)
   const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './'
   const {context} = github
   const pullRequest = context?.payload?.pull_request
