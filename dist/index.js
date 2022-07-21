@@ -1064,10 +1064,12 @@ function run() {
         core.info(`currentBranch: ${currentBranch}`);
         core.info(`defaultBranch: ${defaultBranch}`);
         const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
-        yield workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only']);
+        // await workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only'])
         const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.run('git', ['checkout', defaultBranch]);
+        const mainPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
+        core.info(`mainPkg: ${mainPkg.version}`);
         const newVersion = chProcess
             .execSync(`npm version --git-tag-version=false ${semverLabel}`)
             .toString()

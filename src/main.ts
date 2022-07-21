@@ -32,10 +32,12 @@ async function run(): Promise<void> {
   core.info(`currentBranch: ${currentBranch}`)
   core.info(`defaultBranch: ${defaultBranch}`)
   const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
-  await workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only'])
+  // await workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only'])
   const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
   const currentBranchVersion = currentPkg.version
   await workspaceEnv.run('git', ['checkout', defaultBranch])
+  const mainPkg = (await getPackageJson(originalGitHubWorkspace)) as any
+  core.info(`mainPkg: ${mainPkg.version}`)
   const newVersion = chProcess
     .execSync(`npm version --git-tag-version=false ${semverLabel}`)
     .toString()
