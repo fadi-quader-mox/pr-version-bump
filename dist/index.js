@@ -674,8 +674,6 @@ class WorkspaceEnv {
                 });
                 child.stderr.on('data', chunk => errorMessages.push(chunk));
                 child.on('exit', code => {
-                    core.info(`command: ${command}`);
-                    core.info(`args: ${args.join(' ')}`);
                     if (!isDone) {
                         if (code === 0) {
                             void resolve(null);

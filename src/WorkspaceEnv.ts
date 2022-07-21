@@ -3,7 +3,7 @@ import {EOL} from 'os'
 import {spawn} from 'child_process'
 
 export class WorkspaceEnv {
-  private workspace: string
+  private readonly workspace: string
   constructor(workspace: string) {
     this.workspace = workspace
   }
@@ -22,8 +22,6 @@ export class WorkspaceEnv {
       })
       child.stderr.on('data', chunk => errorMessages.push(chunk))
       child.on('exit', code => {
-        core.info(`command: ${command}`)
-        core.info(`args: ${args.join(' ')}`)
         if (!isDone) {
           if (code === 0) {
             void resolve(null)
