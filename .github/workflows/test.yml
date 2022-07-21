@@ -2,7 +2,6 @@ name: 'Bump Version'
 on:
   pull_request_target:
     types:
-      - opened
       - edited
       - ready_for_review
       - labeled
@@ -11,6 +10,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.10.0
+        with:
+          access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: 'actions/checkout@v3'
       - uses: ./
         with:
