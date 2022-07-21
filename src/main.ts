@@ -29,20 +29,18 @@ async function run(): Promise<void> {
   }
   const defaultBranch = pullRequest?.base.repo.default_branch
   const currentBranch = pullRequest?.head.ref
+  core.info(`currentBranch: ${currentBranch}`)
+  core.info(`defaultBranch: ${defaultBranch}`)
   const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
-  await workspaceEnv.checkout(defaultBranch)
-  const mainPkg = (await getPackageJson(originalGitHubWorkspace)) as any
-  core.info(`mainPkg: ${mainPkg.version}`)
+  await workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only'])
+  const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
+  const currentBranchVersion = currentPkg.version
+  await workspaceEnv.run('git', ['checkout', defaultBranch])
   const newVersion = chProcess
     .execSync(`npm version --git-tag-version=false ${semverLabel}`)
     .toString()
     .trim()
     .replace(/^v/, '')
-
-  await workspaceEnv.checkout(currentBranch)
-  await workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only'])
-  const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
-  const currentBranchVersion = currentPkg.version
 
   core.debug(`newVersion: ${newVersion}`)
   await workspaceEnv.run('git', ['fetch'])
@@ -52,7 +50,12 @@ async function run(): Promise<void> {
     core.info('✅ Version is already bumped! Skipping..')
     return
   }
-  await workspaceEnv.checkout(currentBranch)
+  await workspaceEnv.run('git', [
+    'checkout',
+    currentBranch,
+    '--progress',
+    '--force'
+  ])
   currentPkg.version = newVersion
   writePackageJson(originalGitHubWorkspace, currentPkg)
   await workspaceEnv.setGithubUsernameAndPassword(

@@ -1066,19 +1066,18 @@ function run() {
         }
         const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
         const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
+        core.info(`currentBranch: ${currentBranch}`);
+        core.info(`defaultBranch: ${defaultBranch}`);
         const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
-        yield workspaceEnv.checkout(defaultBranch);
-        const mainPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
-        core.info(`mainPkg: ${mainPkg.version}`);
+        yield workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only']);
+        const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
+        const currentBranchVersion = currentPkg.version;
+        yield workspaceEnv.run('git', ['checkout', defaultBranch]);
         const newVersion = chProcess
             .execSync(`npm version --git-tag-version=false ${semverLabel}`)
             .toString()
             .trim()
             .replace(/^v/, '');
-        yield workspaceEnv.checkout(currentBranch);
-        yield workspaceEnv.run('git', ['pull', 'origin', currentBranch, '--ff-only']);
-        const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
-        const currentBranchVersion = currentPkg.version;
         core.debug(`newVersion: ${newVersion}`);
         yield workspaceEnv.run('git', ['fetch']);
         core.info(`currentBranchVersion: ${currentBranchVersion}`);
@@ -1087,7 +1086,12 @@ function run() {
             core.info('✅ Version is already bumped! Skipping..');
             return;
         }
-        yield workspaceEnv.checkout(currentBranch);
+        yield workspaceEnv.run('git', [
+            'checkout',
+            currentBranch,
+            '--progress',
+            '--force'
+        ]);
         currentPkg.version = newVersion;
         (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
         yield workspaceEnv.setGithubUsernameAndPassword(GITHUB_ACTOR, `${GITHUB_ACTOR}@users.noreply.github.com`);
