@@ -1074,6 +1074,7 @@ function run() {
         core.debug(`currentBranch: ${currentBranch}`);
         const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
         yield workspaceEnv.run('git', ['fetch']);
+        yield workspaceEnv.checkout(currentBranch);
         const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         const currentBranchVersion = currentPkg.version;
         yield workspaceEnv.checkout(defaultBranch);

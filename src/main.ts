@@ -36,6 +36,7 @@ async function run(): Promise<void> {
   core.debug(`currentBranch: ${currentBranch}`)
   const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
   await workspaceEnv.run('git', ['fetch'])
+  await workspaceEnv.checkout(currentBranch)
   const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
   const currentBranchVersion = currentPkg.version
   await workspaceEnv.checkout(defaultBranch)
