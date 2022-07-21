@@ -19,7 +19,7 @@ async function run(): Promise<void> {
   const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
   const labels: string[] = pullRequest?.labels.map(label => label?.name)
   const currentPkg: PackageJson = await getPackageJson(originalGitHubWorkspace)
-  const currentBranchVersion = currentPkg.version
+  // const currentBranchVersion = currentPkg.version
   await workspaceEnv.run('git', ['checkout', defaultBranch])
   // eslint-disable-next-line no-console
   console.log('defaultBranch: ', defaultBranch)
