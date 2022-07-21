@@ -5,4 +5,3 @@ git add -A
 git commit -m "update TEST-1"
 git push origin TEST-1
 git checkout main
-git pu
