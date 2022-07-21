@@ -7,8 +7,6 @@ import {WorkspaceEnv} from './WorkspaceEnv'
 
 async function run(): Promise<void> {
   const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
-  const GITHUB_EMAIL = process.env.GITHUB_EMAIL || ''
-  const GITHUB_USER = process.env.GITHUB_USER || ''
   const GITHUB_ACTOR = process.env.GITHUB_ACTOR || ''
   const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || ''
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -51,8 +49,16 @@ async function run(): Promise<void> {
   // eslint-disable-next-line no-console
   console.log('newPkgVersion: ', currentPkg1.version)
 
-  await workspaceEnv.run('git', ['config', 'user.name', `"${GITHUB_USER}"`])
-  await workspaceEnv.run('git', ['config', 'user.email', `"${GITHUB_EMAIL}"`])
+  const githubUsername = await workspaceEnv.run('git', [
+    'log -n 1',
+    '--pretty=format:%an'
+  ])
+  const githubEmail = await workspaceEnv.run('git', [
+    'log -n 1',
+    '--pretty=format:%ae'
+  ])
+  await workspaceEnv.run('git', ['config', 'user.name', `"${githubUsername}"`])
+  await workspaceEnv.run('git', ['config', 'user.email', `"${githubEmail}"`])
 
   await workspaceEnv.run('git', [
     'commit',
