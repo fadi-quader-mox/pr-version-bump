@@ -4,14 +4,6 @@ inputs:
   GITHUB_TOKEN:
     description: "Github Token"
     required: true
-#  PR_BRANCH:
-#    description: "PR Branch"
-#    required: true
-  MAIN_BRANCH:
-    description: "Main Branch"
-    required: true
-    default: 'main'
-
 runs:
   using: node16
 

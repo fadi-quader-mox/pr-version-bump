@@ -1010,6 +1010,10 @@ function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
+        const GITHUB_EMAIL = process.env.GITHUB_EMAIL || '';
+        const GITHUB_USER = process.env.GITHUB_USER || '';
+        const GITHUB_ACTOR = process.env.GITHUB_ACTOR || '';
+        const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || '';
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const octokit = github.getOctokit(GITHUB_TOKEN);
         const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './';
@@ -1046,13 +1050,15 @@ function run() {
         const currentPkg1 = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
         // eslint-disable-next-line no-console
         console.log('newPkgVersion: ', currentPkg1.version);
+        yield workspaceEnv.run('git', ['config', 'user.name', `"${GITHUB_USER}"`]);
+        yield workspaceEnv.run('git', ['config', 'user.email', `"${GITHUB_EMAIL}"`]);
         yield workspaceEnv.run('git', [
             'commit',
             '-a',
             '-m',
             `chore: bump version to ${newVersion}`
         ]);
-        const remoteRepo = `https://${process.env.GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
+        const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`;
         yield workspaceEnv.run('git', ['push', remoteRepo]);
     });
 }
