@@ -41,13 +41,17 @@ async function run(): Promise<void> {
     .replace(/^v/, '')
 
   core.debug(`newVersion: ${newVersion}`)
-  await workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`])
   await workspaceEnv.run('git', ['fetch'])
   if (newVersion === currentBranchVersion) {
     core.info('✅ Version is already bumped! Skipping..')
     return
   }
-  await workspaceEnv.run('git', ['checkout', currentBranch])
+  await workspaceEnv.run('git', [
+    'checkout',
+    currentBranch,
+    '--progress',
+    '--force'
+  ])
   currentPkg.version = newVersion
   writePackageJson(originalGitHubWorkspace, currentPkg)
   await workspaceEnv.setGithubUsernameAndPassword(
@@ -62,7 +66,6 @@ async function run(): Promise<void> {
     `"chore: auto bump version to ${newVersion}"`
   ])
   core.info(`🔄 Pushing new version to branch ${currentBranch}`)
-  await workspaceEnv.run('git', ['fetch'])
   await workspaceEnv.run('git', ['push', remoteRepo])
   core.info(`✅ Version bumped to ${newVersion}`)
 }

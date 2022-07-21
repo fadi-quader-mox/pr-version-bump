@@ -674,6 +674,8 @@ class WorkspaceEnv {
                 });
                 child.stderr.on('data', chunk => errorMessages.push(chunk));
                 child.on('exit', code => {
+                    core.info(`command: ${command}`);
+                    core.info(`args: ${args.join(' ')}`);
                     if (!isDone) {
                         if (code === 0) {
                             void resolve(null);
@@ -1070,13 +1072,17 @@ function run() {
             .trim()
             .replace(/^v/, '');
         core.debug(`newVersion: ${newVersion}`);
-        yield workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`]);
         yield workspaceEnv.run('git', ['fetch']);
         if (newVersion === currentBranchVersion) {
             core.info('✅ Version is already bumped! Skipping..');
             return;
         }
-        yield workspaceEnv.run('git', ['checkout', currentBranch]);
+        yield workspaceEnv.run('git', [
+            'checkout',
+            currentBranch,
+            '--progress',
+            '--force'
+        ]);
         currentPkg.version = newVersion;
         (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
         yield workspaceEnv.setGithubUsernameAndPassword(GITHUB_ACTOR, `${GITHUB_ACTOR}@users.noreply.github.com`);
@@ -1088,7 +1094,6 @@ function run() {
             `"chore: auto bump version to ${newVersion}"`
         ]);
         core.info(`🔄 Pushing new version to branch ${currentBranch}`);
-        yield workspaceEnv.run('git', ['fetch']);
         yield workspaceEnv.run('git', ['push', remoteRepo]);
         core.info(`✅ Version bumped to ${newVersion}`);
     });
