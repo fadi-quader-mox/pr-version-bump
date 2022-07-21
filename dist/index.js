@@ -1043,7 +1043,8 @@ function run() {
             .trim()
             .replace(/^v/, '');
         core.debug(`newVersion: ${newVersion}`);
-        yield workspaceEnv.run('git', ['fetch', 'origin']);
+        yield workspaceEnv.run('git', ['reset', '--hard', `origin/${defaultBranch}`]);
+        yield workspaceEnv.run('git', ['fetch']);
         if (newVersion === currentBranchVersion) {
             core.info('✅ Version is already bumped! Skipping..');
             return;
@@ -1065,7 +1066,8 @@ function run() {
             `"chore: auto bump version to ${newVersion}"`
         ]);
         core.info(`🔄 Pushing new version to branch ${currentBranch}`);
-        yield workspaceEnv.run('git', ['push', remoteRepo]);
+        yield workspaceEnv.run('git', ['fetch']);
+        yield workspaceEnv.run('git', ['push', remoteRepo, currentBranch]);
         core.info(`✅ Version bumped to ${newVersion}`);
     });
 }
