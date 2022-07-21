@@ -64,6 +64,7 @@ async function run(): Promise<void> {
     `"chore: auto bump version to ${newVersion}"`
   ])
   core.info(`🔄 Pushing new version to branch ${currentBranch}`)
+  await workspaceEnv.run('git', ['fetch'])
   await workspaceEnv.run('git', ['push', remoteRepo])
   core.info(`✅ Version bumped to ${newVersion}`)
 }

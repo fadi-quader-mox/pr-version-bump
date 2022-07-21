@@ -1024,7 +1024,7 @@ function run() {
         const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './';
         const { context } = github;
         const pullRequest = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.pull_request;
-        const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map(label => label === null || label === void 0 ? void 0 : label.name)) !== null && _b !== void 0 ? _b : [];
+        const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map(label => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
         if (!semverLabel) {
             core.setFailed(`❌ Invalid version labels, please provide one of these labels: ${constans_1.SEM_VERSIONS.join(', ')}`);
@@ -1065,6 +1065,7 @@ function run() {
             `"chore: auto bump version to ${newVersion}"`
         ]);
         core.info(`🔄 Pushing new version to branch ${currentBranch}`);
+        yield workspaceEnv.run('git', ['fetch']);
         yield workspaceEnv.run('git', ['push', remoteRepo]);
         core.info(`✅ Version bumped to ${newVersion}`);
     });
