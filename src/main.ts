@@ -7,7 +7,7 @@ import {
   writePackageJson
 } from './utils'
 import {WorkspaceEnv} from './WorkspaceEnv'
-import {SEM_VERSIONS} from './constans'
+import {SEM_VERSIONS} from './constants'
 
 async function run(): Promise<void> {
   const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
@@ -19,7 +19,7 @@ async function run(): Promise<void> {
   if (!pullRequest) return
 
   const labels: string[] =
-    pullRequest?.labels.map(label => label?.name.trim()) ?? []
+    pullRequest?.labels.map((label) => label?.name.trim()) ?? []
   const semverLabel: string = getSemverLabel(labels)
   core.info(`semver ${semverLabel}`)
   if (!semverLabel) {

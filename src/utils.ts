@@ -1,6 +1,6 @@
 import {existsSync, writeFileSync} from 'fs'
 import * as path from 'path'
-import {SEM_VERSIONS} from './constans'
+import {SEM_VERSIONS} from './constants'
 import {execSync} from 'child_process'
 
 export async function getPackageJson(workspace: string): Promise<never> {
