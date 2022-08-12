@@ -1,5 +1,5 @@
-## PR semver bump
-GitHub action that automatically bumps the version in `package.json` in your pull request base on PR labels by comparing against the version on the main branch.
+## PR Semver Bump
+GitHub action that automatically bumps the version in `package.json` of your pull request based on PR labels by comparing the versinon of your PR to the version of the main branch.
 Currently. The next version will be commited and pushed to your pull request.
 This action is useful when the version **can not** be automatically bumped because the branch is protected.
 
