@@ -1,4 +1,4 @@
-name: 'Create new Semantic Version'
+name: 'mox/pr-version-bump'
 description: 'Create new Semantic Version for Pull Request'
 inputs:
   GITHUB_TOKEN:
