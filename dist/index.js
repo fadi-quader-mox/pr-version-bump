@@ -104,6 +104,18 @@ module.exports = eval("require")("encoding");
 
 /***/ }),
 
+/***/ 32:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SEM_VERSIONS = void 0;
+exports.SEM_VERSIONS = ['major', 'minor', 'patch'];
+
+
+/***/ }),
+
 /***/ 49:
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
@@ -613,105 +625,6 @@ exports.debug = debug; // for test
 
 /***/ }),
 
-/***/ 152:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.WorkspaceEnv = void 0;
-const core = __importStar(__webpack_require__(470));
-const os_1 = __webpack_require__(87);
-const child_process_1 = __webpack_require__(129);
-class WorkspaceEnv {
-    constructor(workspace) {
-        this.workspace = workspace;
-    }
-    run(command, args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return new Promise((resolve, reject) => {
-                const child = (0, child_process_1.spawn)(command, args, { cwd: this.workspace });
-                let isDone = false;
-                const errorMessages = [];
-                child.on('error', error => {
-                    core.error(error);
-                    if (!isDone) {
-                        isDone = true;
-                        reject(error);
-                    }
-                });
-                child.stderr.on('data', chunk => errorMessages.push(chunk));
-                child.on('exit', code => {
-                    if (!isDone) {
-                        if (code === 0) {
-                            void resolve(null);
-                        }
-                        else {
-                            core.error(`${command} ${args.join(', ')}`);
-                            const error = new Error(`${errorMessages.join('')}${os_1.EOL}${command} exited with code ${code}`);
-                            reject(error);
-                        }
-                    }
-                });
-            });
-        });
-    }
-    setGithubUsernameAndPassword(username, email) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield Promise.all([
-                this.run('git', ['config', 'user.name', `"${username}"`]),
-                this.run('git', ['config', 'user.email', `"${email}"`])
-            ]);
-        });
-    }
-    checkout(ref) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.run('git', ['checkout', ref, '--progress', '--force']);
-        });
-    }
-    commit(msg) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.run('git', ['commit', '-a', '-m', `${msg}`]);
-        });
-    }
-}
-exports.WorkspaceEnv = WorkspaceEnv;
-
-
-/***/ }),
-
 /***/ 176:
 /***/ (function(__unusedmodule, exports, __webpack_require__) {
 
@@ -1048,36 +961,38 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const github = __importStar(__webpack_require__(469));
 const utils_1 = __webpack_require__(611);
-const WorkspaceEnv_1 = __webpack_require__(152);
-const constans_1 = __webpack_require__(416);
+const constants_1 = __webpack_require__(32);
+const command_manager_1 = __webpack_require__(273);
+const git_command_manager_1 = __webpack_require__(289);
 function run() {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
         const GITHUB_ACTOR = process.env.GITHUB_ACTOR || '';
         const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || '';
-        const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './';
+        const GITHUB_WORKSPACE = process.env['GITHUB_WORKSPACE'] || './';
         const { context } = github;
         const pullRequest = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.pull_request;
         if (!pullRequest)
             return;
-        const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map(label => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
+        const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
         core.info(`semver ${semverLabel}`);
         if (!semverLabel) {
-            core.setFailed(`❌ Invalid version labels, please provide one of these labels: ${constans_1.SEM_VERSIONS.join(', ')}`);
+            core.setFailed(`❌ Invalid version labels, please provide one of these labels: ${constants_1.SEM_VERSIONS.join(', ')}`);
             return;
         }
         const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
         core.debug(`Main branch: ${defaultBranch}`);
         const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
         core.debug(`Current branch: ${currentBranch}`);
-        const workspaceEnv = new WorkspaceEnv_1.WorkspaceEnv(originalGitHubWorkspace);
-        yield workspaceEnv.run('git', ['fetch']);
-        yield workspaceEnv.checkout(currentBranch);
-        const currentPkg = (yield (0, utils_1.getPackageJson)(originalGitHubWorkspace));
+        const commandManager = (0, command_manager_1.createCommandManager)(GITHUB_WORKSPACE);
+        const gitCommandManager = new git_command_manager_1.GitCommandManager(commandManager);
+        yield gitCommandManager.fetch();
+        yield gitCommandManager.checkout(currentBranch);
+        const currentPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
         const currentBranchVersion = currentPkg.version;
-        yield workspaceEnv.checkout(defaultBranch);
+        yield gitCommandManager.checkout(defaultBranch);
         const newVersion = (0, utils_1.generateNewVersion)(semverLabel);
         core.info(`Current version: ${currentBranchVersion}`);
         core.info(`New version: ${newVersion}`);
@@ -1085,14 +1000,14 @@ function run() {
             core.info('✅ Version is already bumped! No action needed..');
             return;
         }
-        yield workspaceEnv.checkout(currentBranch);
+        yield gitCommandManager.checkout(currentBranch);
         currentPkg.version = newVersion;
-        (0, utils_1.writePackageJson)(originalGitHubWorkspace, currentPkg);
-        yield workspaceEnv.setGithubUsernameAndPassword(GITHUB_ACTOR, `${GITHUB_ACTOR}@users.noreply.github.com`);
-        const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`;
-        yield workspaceEnv.commit(`(chore): auto bump version to ${newVersion}`);
+        (0, utils_1.writePackageJson)(GITHUB_WORKSPACE, currentPkg);
+        yield gitCommandManager.setGithubUsernameAndPassword(GITHUB_ACTOR);
+        const remoteRepo = (0, utils_1.buildRemoteRepoURL)(GITHUB_ACTOR, GITHUB_TOKEN, GITHUB_REPOSITORY);
+        yield gitCommandManager.commit(`(chore): auto bump version to ${newVersion}`);
         core.info(`🔄 Pushing a new version to branch ${currentBranch}..`);
-        yield workspaceEnv.run('git', ['push', remoteRepo]);
+        yield gitCommandManager.push(remoteRepo);
         core.info(`✅ Version bumped to ${newVersion} for this PR.`);
     });
 }
@@ -1176,6 +1091,90 @@ exports.Context = Context;
 
 /***/ }),
 
+/***/ 273:
+/***/ (function(__unusedmodule, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createCommandManager = void 0;
+const core = __importStar(__webpack_require__(470));
+const os_1 = __webpack_require__(87);
+const child_process_1 = __webpack_require__(129);
+const createCommandManager = (workspace) => {
+    return new CommandManager(workspace);
+};
+exports.createCommandManager = createCommandManager;
+class CommandManager {
+    constructor(workspace) {
+        this.workspace = workspace;
+    }
+    run(command, args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return new Promise((resolve, reject) => {
+                const child = (0, child_process_1.spawn)(command, args, { cwd: this.workspace });
+                let isDone = false;
+                const errorMessages = [];
+                child.on('error', (error) => {
+                    core.error(error);
+                    if (!isDone) {
+                        isDone = true;
+                        reject(error);
+                    }
+                });
+                child.stderr.on('data', (chunk) => errorMessages.push(chunk));
+                child.on('exit', (code) => {
+                    if (isDone)
+                        return;
+                    if (code === 0) {
+                        void resolve(null);
+                    }
+                    else {
+                        core.error(`${command} ${args.join(', ')}`);
+                        const error = new Error(`${errorMessages.join('')}${os_1.EOL}${command} exited with code ${code}`);
+                        reject(error);
+                    }
+                });
+            });
+        });
+    }
+}
+
+
+/***/ }),
+
 /***/ 280:
 /***/ (function(module) {
 
@@ -1206,6 +1205,66 @@ function register(state, name, method, options) {
     }, method)();
   });
 }
+
+
+/***/ }),
+
+/***/ 289:
+/***/ (function(__unusedmodule, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GitCommandManager = void 0;
+class GitCommandManager {
+    constructor(commandManager) {
+        this.commandManager = commandManager;
+    }
+    fetch() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.commandManager.run('git', ['fetch']);
+        });
+    }
+    setGithubUsernameAndPassword(username, email) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ghEmail = email || `${username}@users.noreply.github.com`;
+            yield Promise.all([
+                this.commandManager.run('git', ['config', 'user.name', `"${username}"`]),
+                this.commandManager.run('git', ['config', 'user.email', `"${ghEmail}"`])
+            ]);
+        });
+    }
+    checkout(ref) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.commandManager.run('git', [
+                'checkout',
+                ref,
+                '--progress',
+                '--force'
+            ]);
+        });
+    }
+    commit(msg) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.commandManager.run('git', ['commit', '-a', '-m', `${msg}`]);
+        });
+    }
+    push(ref) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.commandManager.run('git', ['push', ref]);
+        });
+    }
+}
+exports.GitCommandManager = GitCommandManager;
 
 
 /***/ }),
@@ -1878,18 +1937,6 @@ exports.endpoint = endpoint;
 /***/ (function(module, __unusedexports, __webpack_require__) {
 
 module.exports = __webpack_require__(141);
-
-
-/***/ }),
-
-/***/ 416:
-/***/ (function(__unusedmodule, exports) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SEM_VERSIONS = void 0;
-exports.SEM_VERSIONS = ['major', 'minor', 'patch'];
 
 
 /***/ }),
@@ -5532,10 +5579,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateNewVersion = exports.getSemverLabel = exports.writePackageJson = exports.getPackageJson = void 0;
+exports.buildRemoteRepoURL = exports.generateNewVersion = exports.getSemverLabel = exports.writePackageJson = exports.getPackageJson = void 0;
 const fs_1 = __webpack_require__(747);
 const path = __importStar(__webpack_require__(622));
-const constans_1 = __webpack_require__(416);
+const constants_1 = __webpack_require__(32);
 const child_process_1 = __webpack_require__(129);
 function getPackageJson(workspace) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -5556,7 +5603,7 @@ function writePackageJson(workspace, newPackageJson) {
 }
 exports.writePackageJson = writePackageJson;
 function getSemverLabel(labels) {
-    const versions = labels.filter(label => constans_1.SEM_VERSIONS.includes(label));
+    const versions = labels.filter((label) => constants_1.SEM_VERSIONS.includes(label));
     if (versions.length !== 1)
         return '';
     return versions[0];
@@ -5569,6 +5616,10 @@ function generateNewVersion(semverLabel) {
         .replace(/^v/, '');
 }
 exports.generateNewVersion = generateNewVersion;
+function buildRemoteRepoURL(actor, token, repo) {
+    return `https://${actor}:${token}@github.com/${repo}.git`;
+}
+exports.buildRemoteRepoURL = buildRemoteRepoURL;
 
 
 /***/ }),

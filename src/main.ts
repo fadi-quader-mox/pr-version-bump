@@ -1,19 +1,21 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {
+  buildRemoteRepoURL,
   generateNewVersion,
   getPackageJson,
   getSemverLabel,
   writePackageJson
 } from './utils'
-import {WorkspaceEnv} from './WorkspaceEnv'
 import {SEM_VERSIONS} from './constants'
+import {createCommandManager, ICommandManager} from './command-manager'
+import {GitCommandManager} from './git-command-manager'
 
 async function run(): Promise<void> {
   const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN')
   const GITHUB_ACTOR = process.env.GITHUB_ACTOR || ''
   const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || ''
-  const originalGitHubWorkspace = process.env['GITHUB_WORKSPACE'] || './'
+  const GITHUB_WORKSPACE = process.env['GITHUB_WORKSPACE'] || './'
   const {context} = github
   const pullRequest = context?.payload?.pull_request
   if (!pullRequest) return
@@ -34,12 +36,15 @@ async function run(): Promise<void> {
   core.debug(`Main branch: ${defaultBranch}`)
   const currentBranch = pullRequest?.head.ref
   core.debug(`Current branch: ${currentBranch}`)
-  const workspaceEnv: WorkspaceEnv = new WorkspaceEnv(originalGitHubWorkspace)
-  await workspaceEnv.run('git', ['fetch'])
-  await workspaceEnv.checkout(currentBranch)
-  const currentPkg = (await getPackageJson(originalGitHubWorkspace)) as any
+  const commandManager: ICommandManager = createCommandManager(GITHUB_WORKSPACE)
+  const gitCommandManager: GitCommandManager = new GitCommandManager(
+    commandManager
+  )
+  await gitCommandManager.fetch()
+  await gitCommandManager.checkout(currentBranch)
+  const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   const currentBranchVersion = currentPkg.version
-  await workspaceEnv.checkout(defaultBranch)
+  await gitCommandManager.checkout(defaultBranch)
   const newVersion = generateNewVersion(semverLabel)
   core.info(`Current version: ${currentBranchVersion}`)
   core.info(`New version: ${newVersion}`)
@@ -48,17 +53,18 @@ async function run(): Promise<void> {
     return
   }
 
-  await workspaceEnv.checkout(currentBranch)
+  await gitCommandManager.checkout(currentBranch)
   currentPkg.version = newVersion
-  writePackageJson(originalGitHubWorkspace, currentPkg)
-  await workspaceEnv.setGithubUsernameAndPassword(
+  writePackageJson(GITHUB_WORKSPACE, currentPkg)
+  await gitCommandManager.setGithubUsernameAndPassword(GITHUB_ACTOR)
+  const remoteRepo = buildRemoteRepoURL(
     GITHUB_ACTOR,
-    `${GITHUB_ACTOR}@users.noreply.github.com`
+    GITHUB_TOKEN,
+    GITHUB_REPOSITORY
   )
-  const remoteRepo = `https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git`
-  await workspaceEnv.commit(`(chore): auto bump version to ${newVersion}`)
+  await gitCommandManager.commit(`(chore): auto bump version to ${newVersion}`)
   core.info(`🔄 Pushing a new version to branch ${currentBranch}..`)
-  await workspaceEnv.run('git', ['push', remoteRepo])
+  await gitCommandManager.push(remoteRepo)
   core.info(`✅ Version bumped to ${newVersion} for this PR.`)
 }
 
