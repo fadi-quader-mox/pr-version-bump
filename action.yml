@@ -1,9 +1,12 @@
-name: 'mox/pr-version-bump'
-description: 'Create new Semantic Version for Pull Request'
+name: 'fadiquader/pr-semver-bump'
+description: 'Create a new Semantic Version for Pull Request'
 inputs:
   GITHUB_TOKEN:
     description: "Github Token"
     required: true
+outputs:
+  nextVersion:
+    description: 'Next version'
 runs:
   using: node16
   main: dist/index.js

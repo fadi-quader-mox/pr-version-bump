@@ -66,6 +66,7 @@ async function run(): Promise<void> {
   core.info(`🔄 Pushing a new version to branch ${currentBranch}..`)
   await gitCommandManager.push(remoteRepo)
   core.info(`✅ Version bumped to ${newVersion} for this PR.`)
+  core.setOutput('nextVersion', newVersion)
 }
 
 void run()
