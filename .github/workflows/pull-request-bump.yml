@@ -16,7 +16,8 @@ jobs:
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: 'actions/checkout@v3'
-      - uses: ./
+      - name: 'PR Version Bump'
+        uses: fadiquader/pr-semver-bump@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
