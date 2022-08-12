@@ -15,9 +15,9 @@ jobs:
         uses: styfle/cancel-workflow-action@0.10.0
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: 'actions/checkout@v3'
-      - name: 'PR Version Bump'
-        uses: fadiquader/pr-semver-bump@v1.0.0
+      - uses: actions/checkout@v3
+      - name: Pull Request Semver Action
+        uses: fadi-quader-mox/auto-bump-version@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
