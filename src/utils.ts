@@ -21,7 +21,7 @@ export function writePackageJson(workspace: string, newPackageJson): void {
 }
 
 export function getSemverLabel(labels: string[]): string {
-  const versions = labels.filter(label => SEM_VERSIONS.includes(label))
+  const versions = labels.filter((label) => SEM_VERSIONS.includes(label))
   if (versions.length !== 1) return ''
 
   return versions[0]
@@ -32,4 +32,12 @@ export function generateNewVersion(semverLabel): string {
     .toString()
     .trim()
     .replace(/^v/, '')
+}
+
+export function buildRemoteRepoURL(
+  actor: string,
+  token: string,
+  repo: string
+): string {
+  return `https://${actor}:${token}@github.com/${repo}.git`
 }
