@@ -22,7 +22,7 @@ This action is useful when the version **can not** be automatically bumped becau
 ```yaml
 - uses: 'actions/checkout@v3'
 - name: 'PR Version Bump'
-  uses: fadiquader/pr-semver-bump
+  uses: fadiquader/pr-semver-bump@v1.0.0
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -49,7 +49,7 @@ jobs:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: 'actions/checkout@v3'
       - name: 'PR Version Bump'
-        uses: fadiquader/pr-semver-bump
+        uses: fadiquader/pr-semver-bump@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
