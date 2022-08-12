@@ -16,7 +16,7 @@ jobs:
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: 'actions/checkout@v3'
-      - name: 'Auto bump'
+      - name: 'PR Version Bump'
       - uses: ./
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
