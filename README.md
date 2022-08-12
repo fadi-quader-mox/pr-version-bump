@@ -20,9 +20,8 @@ This action is useful when the version **can not** be automatically bumped becau
 
 ## Usage
 ```yaml
-- uses: 'actions/checkout@v3'
-- name: 'PR Version Bump'
-  uses: fadiquader/pr-semver-bump@v1.0.0
+- name: Pull Request Semver Action
+  uses: 'fadi-quader-mox/auto-bump-version@v1.0.0'
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -48,9 +47,8 @@ jobs:
         with:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: 'actions/checkout@v3'
-      - name: 'PR Version Bump'
-        uses: fadiquader/pr-semver-bump@v1.0.0
+      - name: Pull Request Semver Action
+        uses: 'fadi-quader-mox/auto-bump-version@v1.0.0'
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 ```
