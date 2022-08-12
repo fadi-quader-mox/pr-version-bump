@@ -1009,6 +1009,7 @@ function run() {
         core.info(`🔄 Pushing a new version to branch ${currentBranch}..`);
         yield gitCommandManager.push(remoteRepo);
         core.info(`✅ Version bumped to ${newVersion} for this PR.`);
+        core.setOutput('nextVersion', newVersion);
     });
 }
 void run();
