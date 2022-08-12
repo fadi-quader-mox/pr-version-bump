@@ -13,3 +13,9 @@ This action is useful when the version **can not** be automatically bumped becau
 * When labels change, the action will be triggered.
 
 ## Usage
+```yaml
+- name: 'PR Version Bump'
+- uses: ./
+  with:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
