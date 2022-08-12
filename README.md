@@ -26,7 +26,7 @@ This action is useful when the version **can not** be automatically bumped becau
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
-It's recommend to use [`styfle/cancel-workflow-action@0.10.0`](https://github.com/marketplace/actions/cancel-workflow-action) to cancel previous running actions to avoid confliciting actions
+It's recommend to use this action with [`styfle/cancel-workflow-action@0.10.0`](https://github.com/marketplace/actions/cancel-workflow-action) to cancel previous running actions in order to avoid confliciting actions
 
 #### Full example
 ```yaml
