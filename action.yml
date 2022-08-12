@@ -8,7 +8,7 @@ inputs:
     description: "Github Token"
     required: true
 outputs:
-  nextVersion:
+  NEXT_VERSION:
     description: 'Next version'
 runs:
   using: node16
