@@ -1,4 +1,4 @@
-name: 'fadiquader/pr-semver-bump'
+name: Pull Request Semver Action
 description: 'Create a new Semantic Version for Pull Request'
 branding:
   icon: anchor
