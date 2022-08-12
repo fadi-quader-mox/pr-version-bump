@@ -1,5 +1,8 @@
 name: 'fadiquader/pr-semver-bump'
 description: 'Create a new Semantic Version for Pull Request'
+branding:
+  icon: anchor
+  color: blue
 inputs:
   GITHUB_TOKEN:
     description: "Github Token"
