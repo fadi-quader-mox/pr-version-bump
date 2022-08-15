@@ -10,7 +10,7 @@ This action is useful when the version **can not** be automatically bumped after
 * The action will fail if:
   * There are no labels provided
   * More than one label were applied. i.e. patch, major
-* When labels change, the action will be automatically triggered.
+* When labels change, the action will automatically trigger.
 
 ## Options
 ### Inputs
