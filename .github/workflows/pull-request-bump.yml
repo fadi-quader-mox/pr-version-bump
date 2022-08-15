@@ -17,7 +17,7 @@ jobs:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/checkout@v3
       - name: Pull Request Semver Action
-        uses: fadi-quader-mox/auto-bump-version@v1.0.0
+        uses: ./
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

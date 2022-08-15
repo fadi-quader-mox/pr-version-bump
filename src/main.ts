@@ -62,7 +62,7 @@ async function run(): Promise<void> {
     GITHUB_TOKEN,
     GITHUB_REPOSITORY
   )
-  await gitCommandManager.commit(`(chore): auto bump version to ${newVersion}`)
+  await gitCommandManager.commit(`CI: Bump version to ${newVersion}`)
   core.info(`🔄 Pushing a new version to branch ${currentBranch}..`)
   await gitCommandManager.push(remoteRepo)
   core.info(`✅ Version bumped to ${newVersion} for this PR.`)

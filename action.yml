@@ -1,5 +1,5 @@
-name: Pull Request Semver Action
-description: 'Create a new Semantic Version for Pull Request'
+name: Pull Request Version Bump
+description: 'Create a new semantic version that is automatically committed and pushed to your Pull Request'
 branding:
   icon: anchor
   color: blue
