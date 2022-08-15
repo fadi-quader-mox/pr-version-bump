@@ -21,7 +21,7 @@ This action is useful when the version **can not** be automatically bumped after
 ## Usage
 ```yaml
 - name: Pull Request Semver Action
-  uses: 'fadi-quader-mox/auto-bump-version@v1.0.0'
+  uses: fadi-quader-mox/pr-version-bump@v1.0.0
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -48,7 +48,7 @@ jobs:
           access_token: ${{ secrets.GITHUB_TOKEN }}
       - uses: 'actions/checkout@v3'
       - name: Pull Request Version Bump
-        uses: 'fadi-quader-mox/pr-version-bump@v1.0.0'
+        uses: fadi-quader-mox/pr-version-bump@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
