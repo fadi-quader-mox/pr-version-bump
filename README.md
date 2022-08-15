@@ -37,6 +37,7 @@ on:
       - edited
       - ready_for_review
       - labeled
+      - reopened
 
 jobs:
   test:
