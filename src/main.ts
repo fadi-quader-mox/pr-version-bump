@@ -20,8 +20,6 @@ async function run(): Promise<void> {
   const pullRequest = context?.payload?.pull_request
   if (!pullRequest) return
 
-  const labels: string[] =
-    pullRequest?.labels.map((label) => label?.name.trim()) ?? []
   const defaultBranch = pullRequest?.base.repo.default_branch
   core.debug(`Main branch: ${defaultBranch}`)
   const currentBranch = pullRequest?.head.ref
@@ -31,18 +29,20 @@ async function run(): Promise<void> {
     commandManager
   )
   await gitCommandManager.fetch()
+  const defaultBranchVersion = await commandManager.run('npm', [
+    'pkg',
+    'get',
+    'version'
+  ])
+  core.info(`defaultBranchVersion: ${defaultBranchVersion}`)
   await gitCommandManager.checkout(currentBranch)
   const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   const currentBranchVersion = currentPkg.version
-  core.info(`Current Version: ${currentBranchVersion}`)
-  await gitCommandManager.checkout(defaultBranch)
+  core.info(`currentBranchVersion: ${currentBranchVersion}`)
+  const labels: string[] =
+    pullRequest?.labels.map((label) => label?.name.trim()) ?? []
   const semverLabel: string = getSemverLabel(labels)
-  core.info(`semver: ${semverLabel || 'No provided'}`)
   if (!semverLabel) {
-    await gitCommandManager.fetch()
-    const defaultBranchPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
-    const defaultBranchVersion = defaultBranchPkg.version
-    core.info(`Default branch version: ${defaultBranchVersion}`)
     if (currentBranchVersion > defaultBranchVersion) {
       core.info('✅ Version was manually bumped! Skipping..')
     } else {
@@ -55,12 +55,12 @@ async function run(): Promise<void> {
 
     return
   }
-
+  await gitCommandManager.checkout(defaultBranch)
   const newVersion = generateNewVersion(semverLabel)
   core.info(`Current version: ${currentBranchVersion}`)
   core.info(`New version: ${newVersion}`)
   if (newVersion === currentBranchVersion) {
-    core.info('✅ Version is already bumped! Skipping..')
+    core.info('✅ Version is already bumped! No action needed..')
     return
   }
 

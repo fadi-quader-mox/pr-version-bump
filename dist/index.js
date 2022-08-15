@@ -975,7 +975,6 @@ function run() {
         const pullRequest = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.pull_request;
         if (!pullRequest)
             return;
-        const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
         const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
         core.debug(`Main branch: ${defaultBranch}`);
         const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
@@ -983,18 +982,19 @@ function run() {
         const commandManager = (0, command_manager_1.createCommandManager)(GITHUB_WORKSPACE);
         const gitCommandManager = new git_command_manager_1.GitCommandManager(commandManager);
         yield gitCommandManager.fetch();
+        const defaultBranchVersion = yield commandManager.run('npm', [
+            'pkg',
+            'get',
+            'version'
+        ]);
+        core.info(`defaultBranchVersion: ${defaultBranchVersion}`);
         yield gitCommandManager.checkout(currentBranch);
         const currentPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
         const currentBranchVersion = currentPkg.version;
-        core.info(`Current Version: ${currentBranchVersion}`);
-        yield gitCommandManager.checkout(defaultBranch);
+        core.info(`currentBranchVersion: ${currentBranchVersion}`);
+        const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
-        core.info(`semver: ${semverLabel || 'No provided'}`);
         if (!semverLabel) {
-            yield gitCommandManager.fetch();
-            const defaultBranchPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
-            const defaultBranchVersion = defaultBranchPkg.version;
-            core.info(`Default branch version: ${defaultBranchVersion}`);
             if (currentBranchVersion > defaultBranchVersion) {
                 core.info('✅ Version was manually bumped! Skipping..');
             }
@@ -1005,11 +1005,12 @@ function run() {
             }
             return;
         }
+        yield gitCommandManager.checkout(defaultBranch);
         const newVersion = (0, utils_1.generateNewVersion)(semverLabel);
         core.info(`Current version: ${currentBranchVersion}`);
         core.info(`New version: ${newVersion}`);
         if (newVersion === currentBranchVersion) {
-            core.info('✅ Version is already bumped! Skipping..');
+            core.info('✅ Version is already bumped! No action needed..');
             return;
         }
         yield gitCommandManager.checkout(currentBranch);
