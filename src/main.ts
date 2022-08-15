@@ -43,6 +43,8 @@ async function run(): Promise<void> {
       GITHUB_WORKSPACE
     )) as any
     const defaultBranchCurrentVersion = defaultBranchMainPackage.version
+    core.debug(`currentBranchVersion: ${currentBranchVersion}`)
+    core.debug(`defaultBranchCurrentVersion: ${defaultBranchCurrentVersion}`)
     if (currentBranchVersion > defaultBranchCurrentVersion) {
       core.info('✅ Version was manually bumped! Skipping..')
     } else {
