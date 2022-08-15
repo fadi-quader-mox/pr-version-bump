@@ -8,8 +8,8 @@ This action is useful when the version **can not** be automatically bumped after
   * Currently, only these labels are supported: `major`, `minor`, `patch`.
   * if current version is `1.0.0` and the label is `minor` then version will be bumped to `1.1.0`
 * The action will fail if:
-  * There are no labels provided
-  * More than one label were applied. i.e. patch, major
+  * Version was not bumped manually and no labels were provided.
+  * More than one label were applied. i.e. patch, major.
 * When labels change, the action will automatically trigger.
 
 ## Options
