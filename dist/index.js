@@ -987,11 +987,7 @@ function run() {
         const currentBranchVersion = currentPkg.version;
         core.info(`currentBranchVersion: ${currentBranchVersion}`);
         yield gitCommandManager.checkout(defaultBranch);
-        const defaultBranchVersion = yield commandManager.run('npm', [
-            'pkg',
-            'get',
-            'version'
-        ]);
+        const defaultBranchVersion = (0, utils_1.getCurrentVersion)();
         core.info(`defaultBranchVersion: ${defaultBranchVersion}`);
         const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
@@ -5593,7 +5589,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildRemoteRepoURL = exports.generateNewVersion = exports.getSemverLabel = exports.writePackageJson = exports.getPackageJson = void 0;
+exports.buildRemoteRepoURL = exports.generateNewVersion = exports.getCurrentVersion = exports.getSemverLabel = exports.writePackageJson = exports.getPackageJson = void 0;
 const fs_1 = __webpack_require__(747);
 const path = __importStar(__webpack_require__(622));
 const child_process_1 = __webpack_require__(129);
@@ -5624,6 +5620,10 @@ function getSemverLabel(labels) {
     return versions[0];
 }
 exports.getSemverLabel = getSemverLabel;
+function getCurrentVersion() {
+    return (0, child_process_1.execSync)('npm pkg get version').toString().trim();
+}
+exports.getCurrentVersion = getCurrentVersion;
 function generateNewVersion(semverLabel) {
     return (0, child_process_1.execSync)(`npm version --git-tag-version=false ${semverLabel}`)
         .toString()
