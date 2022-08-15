@@ -39,9 +39,7 @@ async function run(): Promise<void> {
   const semverLabel: string = getSemverLabel(labels)
   core.info(`semver: ${semverLabel || 'No provided'}`)
   if (!semverLabel) {
-    const defaultBranchPkg = (await getPackageJson(
-      GITHUB_WORKSPACE
-    )) as any
+    const defaultBranchPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
     const defaultBranchVersion = defaultBranchPkg.version
     core.info(`Default branch version: ${defaultBranchVersion}`)
     if (currentBranchVersion > defaultBranchVersion) {
