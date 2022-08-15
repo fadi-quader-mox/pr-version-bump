@@ -29,6 +29,10 @@ export function getSemverLabel(labels: string[]): string {
   return versions[0]
 }
 
+export function getCurrentVersion(): string {
+  return execSync('npm pkg get version').toString().trim()
+}
+
 export function generateNewVersion(semverLabel): string {
   return execSync(`npm version --git-tag-version=false ${semverLabel}`)
     .toString()
