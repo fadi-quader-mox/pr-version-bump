@@ -30,7 +30,6 @@ async function run(): Promise<void> {
   const gitCommandManager: GitCommandManager = new GitCommandManager(
     commandManager
   )
-  await gitCommandManager.fetch()
   await gitCommandManager.checkout(currentBranch)
   const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   const currentBranchVersion = currentPkg.version
@@ -39,6 +38,7 @@ async function run(): Promise<void> {
   const semverLabel: string = getSemverLabel(labels)
   core.info(`semver: ${semverLabel || 'No provided'}`)
   if (!semverLabel) {
+    await gitCommandManager.fetch()
     const defaultBranchPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
     const defaultBranchVersion = defaultBranchPkg.version
     core.info(`Default branch version: ${defaultBranchVersion}`)

@@ -982,7 +982,6 @@ function run() {
         core.debug(`Current branch: ${currentBranch}`);
         const commandManager = (0, command_manager_1.createCommandManager)(GITHUB_WORKSPACE);
         const gitCommandManager = new git_command_manager_1.GitCommandManager(commandManager);
-        yield gitCommandManager.fetch();
         yield gitCommandManager.checkout(currentBranch);
         const currentPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
         const currentBranchVersion = currentPkg.version;
@@ -991,6 +990,7 @@ function run() {
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
         core.info(`semver: ${semverLabel || 'No provided'}`);
         if (!semverLabel) {
+            yield gitCommandManager.fetch();
             const defaultBranchPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
             const defaultBranchVersion = defaultBranchPkg.version;
             core.info(`Default branch version: ${defaultBranchVersion}`);
