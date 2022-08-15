@@ -31,21 +31,17 @@ async function run(): Promise<void> {
     commandManager
   )
   await gitCommandManager.fetch()
+  const defaultBranchPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   await gitCommandManager.checkout(currentBranch)
   const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   const currentBranchVersion = currentPkg.version
-  await gitCommandManager.checkout(defaultBranch)
-
   const semverLabel: string = getSemverLabel(labels)
   core.info(`semver: ${semverLabel || 'No provided'}`)
   if (!semverLabel) {
-    const defaultBranchMainPackage = (await getPackageJson(
-      GITHUB_WORKSPACE
-    )) as any
-    const defaultBranchCurrentVersion = defaultBranchMainPackage.version
+    const defaultBranchVersion = defaultBranchPkg.version
     core.debug(`currentBranchVersion: ${currentBranchVersion}`)
-    core.debug(`defaultBranchCurrentVersion: ${defaultBranchCurrentVersion}`)
-    if (currentBranchVersion > defaultBranchCurrentVersion) {
+    core.debug(`defaultBranchCurrentVersion: ${defaultBranchVersion}`)
+    if (currentBranchVersion > defaultBranchVersion) {
       core.info('✅ Version was manually bumped! Skipping..')
     } else {
       core.setFailed(
@@ -58,6 +54,7 @@ async function run(): Promise<void> {
     return
   }
 
+  await gitCommandManager.checkout(defaultBranch)
   const newVersion = generateNewVersion(semverLabel)
   core.info(`Current version: ${currentBranchVersion}`)
   core.info(`New version: ${newVersion}`)
