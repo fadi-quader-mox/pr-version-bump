@@ -1005,7 +1005,7 @@ function run() {
         (0, utils_1.writePackageJson)(GITHUB_WORKSPACE, currentPkg);
         yield gitCommandManager.setGithubUsernameAndPassword(GITHUB_ACTOR);
         const remoteRepo = (0, utils_1.buildRemoteRepoURL)(GITHUB_ACTOR, GITHUB_TOKEN, GITHUB_REPOSITORY);
-        yield gitCommandManager.commit(`(chore): auto bump version to ${newVersion}`);
+        yield gitCommandManager.commit(`CI: Bump version to ${newVersion}`);
         core.info(`🔄 Pushing a new version to branch ${currentBranch}..`);
         yield gitCommandManager.push(remoteRepo);
         core.info(`✅ Version bumped to ${newVersion} for this PR.`);
@@ -5583,8 +5583,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildRemoteRepoURL = exports.generateNewVersion = exports.getSemverLabel = exports.writePackageJson = exports.getPackageJson = void 0;
 const fs_1 = __webpack_require__(747);
 const path = __importStar(__webpack_require__(622));
-const constants_1 = __webpack_require__(32);
+const os_1 = __webpack_require__(87);
 const child_process_1 = __webpack_require__(129);
+const constants_1 = __webpack_require__(32);
 function getPackageJson(workspace) {
     return __awaiter(this, void 0, void 0, function* () {
         const pathToPackage = path.join(workspace, 'package.json');
@@ -5600,7 +5601,10 @@ function writePackageJson(workspace, newPackageJson) {
     const pathToPackage = path.join(workspace, 'package.json');
     if (!(0, fs_1.existsSync)(pathToPackage))
         throw new Error("package.json could not be found in your project's root.");
-    (0, fs_1.writeFileSync)(pathToPackage, JSON.stringify(newPackageJson, null, 2));
+    (0, fs_1.writeFileSync)(pathToPackage, JSON.stringify(newPackageJson, null, 2), 'utf8');
+    // new line
+    (0, fs_1.appendFileSync)(pathToPackage, os_1.EOL, 'utf8');
+    (0, fs_1.appendFileSync)(pathToPackage, os_1.EOL, 'utf8');
 }
 exports.writePackageJson = writePackageJson;
 function getSemverLabel(labels) {

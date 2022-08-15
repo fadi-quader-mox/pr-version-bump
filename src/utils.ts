@@ -22,6 +22,7 @@ export function writePackageJson(workspace: string, newPackageJson): void {
   writeFileSync(pathToPackage, JSON.stringify(newPackageJson, null, 2), 'utf8')
   // new line
   appendFileSync(pathToPackage, EOL, 'utf8')
+  appendFileSync(pathToPackage, EOL, 'utf8')
 }
 
 export function getSemverLabel(labels: string[]): string {
