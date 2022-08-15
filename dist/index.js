@@ -985,10 +985,10 @@ function run() {
         yield gitCommandManager.checkout(currentBranch);
         const currentPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
         const currentBranchVersion = currentPkg.version;
-        core.info(`currentBranchVersion: ${currentBranchVersion}`);
+        core.debug(`currentBranchVersion: ${currentBranchVersion}`);
         yield gitCommandManager.checkout(defaultBranch);
         const defaultBranchVersion = (0, utils_1.getCurrentVersion)();
-        core.info(`defaultBranchVersion: ${defaultBranchVersion}`);
+        core.debug(`defaultBranchVersion: ${defaultBranchVersion}`);
         const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
         if (!semverLabel) {
