@@ -22,16 +22,6 @@ async function run(): Promise<void> {
 
   const labels: string[] =
     pullRequest?.labels.map((label) => label?.name.trim()) ?? []
-  const semverLabel: string = getSemverLabel(labels)
-  core.info(`semver ${semverLabel}`)
-  if (!semverLabel) {
-    core.setFailed(
-      `❌ Invalid version labels, please provide one of these labels: ${SEM_VERSIONS.join(
-        ', '
-      )}`
-    )
-    return
-  }
   const defaultBranch = pullRequest?.base.repo.default_branch
   core.debug(`Main branch: ${defaultBranch}`)
   const currentBranch = pullRequest?.head.ref
@@ -45,11 +35,32 @@ async function run(): Promise<void> {
   const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   const currentBranchVersion = currentPkg.version
   await gitCommandManager.checkout(defaultBranch)
+
+  const semverLabel: string = getSemverLabel(labels)
+  core.info(`semver: ${semverLabel || 'No provided'}`)
+  if (!semverLabel) {
+    const defaultBranchMainPackage = (await getPackageJson(
+      GITHUB_WORKSPACE
+    )) as any
+    const defaultBranchCurrentVersion = defaultBranchMainPackage.version
+    if (currentBranchVersion > defaultBranchCurrentVersion) {
+      core.info('✅ Version was manually bumped! Skipping..')
+    } else {
+      core.setFailed(
+        `❌ Failed to bump version. To fix it, do one of the following:
+          * Bump the version manually.
+          * Provide one of these labels: ${SEM_VERSIONS.join(', ')}.`
+      )
+    }
+
+    return
+  }
+
   const newVersion = generateNewVersion(semverLabel)
   core.info(`Current version: ${currentBranchVersion}`)
   core.info(`New version: ${newVersion}`)
   if (newVersion === currentBranchVersion) {
-    core.info('✅ Version is already bumped! No action needed..')
+    core.info('✅ Version is already bumped! Skipping..')
     return
   }
 
