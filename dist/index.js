@@ -983,16 +983,17 @@ function run() {
         const commandManager = (0, command_manager_1.createCommandManager)(GITHUB_WORKSPACE);
         const gitCommandManager = new git_command_manager_1.GitCommandManager(commandManager);
         yield gitCommandManager.fetch();
-        const defaultBranchPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
         yield gitCommandManager.checkout(currentBranch);
         const currentPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
         const currentBranchVersion = currentPkg.version;
+        core.info(`Current Version: ${currentBranchVersion}`);
+        yield gitCommandManager.checkout(defaultBranch);
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
         core.info(`semver: ${semverLabel || 'No provided'}`);
         if (!semverLabel) {
+            const defaultBranchPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
             const defaultBranchVersion = defaultBranchPkg.version;
-            core.debug(`currentBranchVersion: ${currentBranchVersion}`);
-            core.debug(`defaultBranchCurrentVersion: ${defaultBranchVersion}`);
+            core.info(`Default branch version: ${defaultBranchVersion}`);
             if (currentBranchVersion > defaultBranchVersion) {
                 core.info('✅ Version was manually bumped! Skipping..');
             }
@@ -1003,7 +1004,6 @@ function run() {
             }
             return;
         }
-        yield gitCommandManager.checkout(defaultBranch);
         const newVersion = (0, utils_1.generateNewVersion)(semverLabel);
         core.info(`Current version: ${currentBranchVersion}`);
         core.info(`New version: ${newVersion}`);
