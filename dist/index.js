@@ -976,12 +976,6 @@ function run() {
         if (!pullRequest)
             return;
         const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
-        const semverLabel = (0, utils_1.getSemverLabel)(labels);
-        core.info(`semver ${semverLabel}`);
-        if (!semverLabel) {
-            core.setFailed(`❌ Invalid version labels, please provide one of these labels: ${constants_1.SEM_VERSIONS.join(', ')}`);
-            return;
-        }
         const defaultBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base.repo.default_branch;
         core.debug(`Main branch: ${defaultBranch}`);
         const currentBranch = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.ref;
@@ -993,11 +987,26 @@ function run() {
         const currentPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
         const currentBranchVersion = currentPkg.version;
         yield gitCommandManager.checkout(defaultBranch);
+        const semverLabel = (0, utils_1.getSemverLabel)(labels);
+        core.info(`semver: ${semverLabel || 'No provided'}`);
+        if (!semverLabel) {
+            const defaultBranchMainPackage = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
+            const defaultBranchCurrentVersion = defaultBranchMainPackage.version;
+            if (currentBranchVersion > defaultBranchCurrentVersion) {
+                core.info('✅ Version was manually bumped! Skipping..');
+            }
+            else {
+                core.setFailed(`❌ Failed to bump version. To fix it, do one of the following:
+          * Bump the version manually.
+          * Provide one of these labels: ${constants_1.SEM_VERSIONS.join(', ')}.`);
+            }
+            return;
+        }
         const newVersion = (0, utils_1.generateNewVersion)(semverLabel);
         core.info(`Current version: ${currentBranchVersion}`);
         core.info(`New version: ${newVersion}`);
         if (newVersion === currentBranchVersion) {
-            core.info('✅ Version is already bumped! No action needed..');
+            core.info('✅ Version is already bumped! Skipping..');
             return;
         }
         yield gitCommandManager.checkout(currentBranch);
