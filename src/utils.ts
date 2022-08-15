@@ -1,6 +1,5 @@
-import {existsSync, writeFileSync, appendFileSync} from 'fs'
+import {existsSync, writeFileSync} from 'fs'
 import * as path from 'path'
-import {EOL} from 'os'
 import {execSync} from 'child_process'
 import {SEM_VERSIONS} from './constants'
 
@@ -21,9 +20,6 @@ export function writePackageJson(workspace: string, newPackageJson): void {
 
   const content = `${JSON.stringify(newPackageJson, null, 2)}\n`
   writeFileSync(pathToPackage, content, 'utf8')
-  // new line
-  appendFileSync(pathToPackage, EOL, 'utf8')
-  appendFileSync(pathToPackage, EOL, 'utf8')
 }
 
 export function getSemverLabel(labels: string[]): string {

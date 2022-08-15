@@ -5583,7 +5583,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildRemoteRepoURL = exports.generateNewVersion = exports.getSemverLabel = exports.writePackageJson = exports.getPackageJson = void 0;
 const fs_1 = __webpack_require__(747);
 const path = __importStar(__webpack_require__(622));
-const os_1 = __webpack_require__(87);
 const child_process_1 = __webpack_require__(129);
 const constants_1 = __webpack_require__(32);
 function getPackageJson(workspace) {
@@ -5603,9 +5602,6 @@ function writePackageJson(workspace, newPackageJson) {
         throw new Error("package.json could not be found in your project's root.");
     const content = `${JSON.stringify(newPackageJson, null, 2)}\n`;
     (0, fs_1.writeFileSync)(pathToPackage, content, 'utf8');
-    // new line
-    (0, fs_1.appendFileSync)(pathToPackage, os_1.EOL, 'utf8');
-    (0, fs_1.appendFileSync)(pathToPackage, os_1.EOL, 'utf8');
 }
 exports.writePackageJson = writePackageJson;
 function getSemverLabel(labels) {
