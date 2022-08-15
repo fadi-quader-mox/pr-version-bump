@@ -5601,7 +5601,8 @@ function writePackageJson(workspace, newPackageJson) {
     const pathToPackage = path.join(workspace, 'package.json');
     if (!(0, fs_1.existsSync)(pathToPackage))
         throw new Error("package.json could not be found in your project's root.");
-    (0, fs_1.writeFileSync)(pathToPackage, JSON.stringify(newPackageJson, null, 2), 'utf8');
+    const content = `${JSON.stringify(newPackageJson, null, 2)}\n`;
+    (0, fs_1.writeFileSync)(pathToPackage, content, 'utf8');
     // new line
     (0, fs_1.appendFileSync)(pathToPackage, os_1.EOL, 'utf8');
     (0, fs_1.appendFileSync)(pathToPackage, os_1.EOL, 'utf8');
