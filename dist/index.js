@@ -982,16 +982,17 @@ function run() {
         const commandManager = (0, command_manager_1.createCommandManager)(GITHUB_WORKSPACE);
         const gitCommandManager = new git_command_manager_1.GitCommandManager(commandManager);
         yield gitCommandManager.fetch();
+        yield gitCommandManager.checkout(currentBranch);
+        const currentPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
+        const currentBranchVersion = currentPkg.version;
+        core.info(`currentBranchVersion: ${currentBranchVersion}`);
+        yield gitCommandManager.checkout(defaultBranch);
         const defaultBranchVersion = yield commandManager.run('npm', [
             'pkg',
             'get',
             'version'
         ]);
         core.info(`defaultBranchVersion: ${defaultBranchVersion}`);
-        yield gitCommandManager.checkout(currentBranch);
-        const currentPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
-        const currentBranchVersion = currentPkg.version;
-        core.info(`currentBranchVersion: ${currentBranchVersion}`);
         const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
         if (!semverLabel) {
@@ -1005,7 +1006,6 @@ function run() {
             }
             return;
         }
-        yield gitCommandManager.checkout(defaultBranch);
         const newVersion = (0, utils_1.generateNewVersion)(semverLabel);
         core.info(`Current version: ${currentBranchVersion}`);
         core.info(`New version: ${newVersion}`);

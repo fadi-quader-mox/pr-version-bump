@@ -29,16 +29,17 @@ async function run(): Promise<void> {
     commandManager
   )
   await gitCommandManager.fetch()
+  await gitCommandManager.checkout(currentBranch)
+  const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
+  const currentBranchVersion = currentPkg.version
+  core.info(`currentBranchVersion: ${currentBranchVersion}`)
+  await gitCommandManager.checkout(defaultBranch)
   const defaultBranchVersion = await commandManager.run('npm', [
     'pkg',
     'get',
     'version'
   ])
   core.info(`defaultBranchVersion: ${defaultBranchVersion}`)
-  await gitCommandManager.checkout(currentBranch)
-  const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
-  const currentBranchVersion = currentPkg.version
-  core.info(`currentBranchVersion: ${currentBranchVersion}`)
   const labels: string[] =
     pullRequest?.labels.map((label) => label?.name.trim()) ?? []
   const semverLabel: string = getSemverLabel(labels)
@@ -55,7 +56,6 @@ async function run(): Promise<void> {
 
     return
   }
-  await gitCommandManager.checkout(defaultBranch)
   const newVersion = generateNewVersion(semverLabel)
   core.info(`Current version: ${currentBranchVersion}`)
   core.info(`New version: ${newVersion}`)
