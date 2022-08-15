@@ -6,7 +6,7 @@ This action is useful when the version **can not** be automatically bumped after
 ## Workflow
 * The action will be triggered based on your PR's labels.
   * Currently, only these labels are supported: `major`, `minor`, `patch`.
-  * if current version is `1.0.0` and the label is `minor` then version will be bumped to `1.1.1
+  * if current version is `1.0.0` and the label is `minor` then version will be bumped to `1.1.0`
 * The action will fail if:
   * There are no labels provided
   * More than one label is not allowed. i.e. patch, major
