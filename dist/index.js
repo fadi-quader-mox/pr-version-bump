@@ -5622,14 +5622,14 @@ function getSemverLabel(labels) {
 }
 exports.getSemverLabel = getSemverLabel;
 function getCurrentVersion() {
-    return (0, child_process_1.execSync)('npm pkg get version').toString().trim();
+    return (0, child_process_1.execSync)('npm pkg get version').toString().trim().replace(/"/g, '');
 }
 exports.getCurrentVersion = getCurrentVersion;
 function generateNewVersion(semverLabel) {
     return (0, child_process_1.execSync)(`npm version --git-tag-version=false ${semverLabel}`)
         .toString()
         .trim()
-        .replace(/"/g, '');
+        .replace(/^v/, '');
 }
 exports.generateNewVersion = generateNewVersion;
 function buildRemoteRepoURL(actor, token, repo) {
