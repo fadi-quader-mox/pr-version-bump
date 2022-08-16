@@ -30,14 +30,14 @@ export function getSemverLabel(labels: string[]): string {
 }
 
 export function getCurrentVersion(): string {
-  return execSync('npm pkg get version').toString().trim()
+  return execSync('npm pkg get version').toString().trim().replace(/"/g, '')
 }
 
 export function generateNewVersion(semverLabel): string {
   return execSync(`npm version --git-tag-version=false ${semverLabel}`)
     .toString()
     .trim()
-    .replace(/"/g, '')
+    .replace(/^v/, '')
 }
 
 export function buildRemoteRepoURL(
