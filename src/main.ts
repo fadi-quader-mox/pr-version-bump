@@ -2,7 +2,8 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import {
   buildRemoteRepoURL,
-  generateNewVersion, getCurrentVersion,
+  generateNewVersion,
+  getCurrentVersion,
   getPackageJson,
   getSemverLabel,
   writePackageJson
@@ -32,10 +33,11 @@ async function run(): Promise<void> {
   await gitCommandManager.checkout(currentBranch)
   const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   const currentBranchVersion = currentPkg.version
-  core.info(`currentBranchVersion: ${currentBranchVersion}`)
+  core.debug(`currentBranchVersion: ${currentBranchVersion}`)
   await gitCommandManager.checkout(defaultBranch)
   const defaultBranchVersion = getCurrentVersion()
-  core.info(`defaultBranchVersion: ${defaultBranchVersion}`)
+  core.debug(`defaultBranchVersion: ${defaultBranchVersion}`)
+
   const labels: string[] =
     pullRequest?.labels.map((label) => label?.name.trim()) ?? []
   const semverLabel: string = getSemverLabel(labels)
@@ -52,6 +54,7 @@ async function run(): Promise<void> {
 
     return
   }
+
   const newVersion = generateNewVersion(semverLabel)
   core.info(`Current version: ${currentBranchVersion}`)
   core.info(`New version: ${newVersion}`)

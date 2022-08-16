@@ -37,7 +37,7 @@ export function generateNewVersion(semverLabel): string {
   return execSync(`npm version --git-tag-version=false ${semverLabel}`)
     .toString()
     .trim()
-    .replace(/^v/, '')
+    .replace(/"/g, '')
 }
 
 export function buildRemoteRepoURL(
