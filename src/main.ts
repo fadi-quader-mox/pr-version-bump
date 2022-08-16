@@ -33,11 +33,10 @@ async function run(): Promise<void> {
   await gitCommandManager.checkout(currentBranch)
   const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   const currentBranchVersion = currentPkg.version
-  core.info(`currentBranchVersion: ${currentBranchVersion}`)
+  core.debug(`currentBranchVersion: ${currentBranchVersion}`)
   await gitCommandManager.checkout(defaultBranch)
   const defaultBranchVersion = getCurrentVersion()
-  core.info(`defaultBranchVersion: ${defaultBranchVersion}`)
-  core.info(`(currentBranchVersion > defaultBranchVersion: ${currentBranchVersion > defaultBranchVersion}`)
+  core.debug(`defaultBranchVersion: ${defaultBranchVersion}`)
 
   const labels: string[] =
     pullRequest?.labels.map((label) => label?.name.trim()) ?? []
