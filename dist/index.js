@@ -5628,7 +5628,7 @@ function generateNewVersion(semverLabel) {
     return (0, child_process_1.execSync)(`npm version --git-tag-version=false ${semverLabel}`)
         .toString()
         .trim()
-        .replace(/^v/, '');
+        .replace(/"/g, '');
 }
 exports.generateNewVersion = generateNewVersion;
 function buildRemoteRepoURL(actor, token, repo) {
