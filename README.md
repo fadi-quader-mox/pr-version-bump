@@ -10,6 +10,7 @@ This action is useful when the version **can not** be automatically bumped after
   * Version was not bumped manually and no labels were provided.
   * More than one label were applied. i.e. patch, major.
 * When labels change, the action will automatically trigger.
+* You can still bump the version manually, but you must not apply any of the semver labels or it will fail.
 
 ## Options
 ### Inputs
