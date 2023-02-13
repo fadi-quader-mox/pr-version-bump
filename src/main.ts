@@ -34,6 +34,7 @@ async function run(): Promise<void> {
   const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   const currentBranchVersion = currentPkg.version
   core.debug(`currentBranchVersion: ${currentBranchVersion}`)
+  await gitCommandManager.diff()
   await gitCommandManager.checkout(defaultBranch)
   const defaultBranchVersion = getCurrentVersion()
   core.debug(`defaultBranchVersion: ${defaultBranchVersion}`)

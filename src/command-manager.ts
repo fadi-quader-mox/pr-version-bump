@@ -3,7 +3,7 @@ import {EOL} from 'os'
 import {spawn} from 'child_process'
 
 export interface ICommandManager {
-  run(command: string, args: string[]): Promise<void>
+  run(command: string, args: string[]): Promise<any>
 }
 
 export const createCommandManager = (workspace: string): ICommandManager => {
@@ -30,10 +30,11 @@ class CommandManager implements ICommandManager {
       })
       child.stderr.on('data', (chunk) => errorMessages.push(chunk))
       child.on('exit', (code) => {
+
         if (isDone) return
 
         if (code === 0) {
-          void resolve(null)
+          void resolve(errorMessages)
         } else {
           core.error(`${command} ${args.join(', ')}`)
           const error = new Error(

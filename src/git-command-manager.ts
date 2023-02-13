@@ -38,4 +38,16 @@ export class GitCommandManager {
   async push(ref: string): Promise<void> {
     await this.commandManager.run('git', ['push', ref])
   }
+
+  async diff(): Promise<string[]> {
+    const filesChanged = await this.commandManager.run('git', [
+      'diff',
+      '--ignore-all-space',
+      '--ignore-blank-lines'
+    ])
+
+    console.log('filesChanged ', filesChanged)
+
+    return filesChanged as string[]
+  }
 }
