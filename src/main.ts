@@ -36,10 +36,10 @@ async function run(): Promise<void> {
   const currentBranchVersion = currentPkg.version
   core.debug(`currentBranchVersion: ${currentBranchVersion}`)
 
-  const base = pullRequest?.base?.sha ?? context.payload.before
-  const head = pullRequest?.head?.sha ?? context.payload.after
+  // const base = pullRequest?.base?.sha ?? context.payload.before
+  // const head = pullRequest?.head?.sha ?? context.payload.after
 
-  const changedFiles = gitCommandManager.diffFiles(base, head, 'graphql')
+  const changedFiles = gitCommandManager.diffFiles(defaultBranch, 'graphql')
   core.info(`changedFiles:  ${changedFiles.join(', ')}`)
   console.log(`changedFiles: ${changedFiles.join(', ')}`)
 

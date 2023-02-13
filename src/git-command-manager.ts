@@ -2,6 +2,8 @@ import {execSync} from 'child_process'
 
 import {ICommandManager} from './command-manager'
 
+const FILE_PATH_REGEX = /(\/[a-zA-Z_0-9-]+)+\.graphql/
+
 export class GitCommandManager {
   private readonly commandManager: ICommandManager
   constructor(commandManager: ICommandManager) {
@@ -13,8 +15,8 @@ export class GitCommandManager {
   }
 
   async setGithubUsernameAndPassword(
-    username: string,
-    email?: string
+      username: string,
+      email?: string
   ): Promise<void> {
     const ghEmail = email || `${username}@users.noreply.github.com`
 
@@ -41,24 +43,25 @@ export class GitCommandManager {
     await this.commandManager.run('git', ['push', ref])
   }
 
-  diffFiles(base: string, head: string, extension?: string): string[] {
+  diffFiles(ref: string, extension?: string): string[] {
     const extensionFilter = extension ? `-- '***.${extension}'` : ''
 
     const changedFiles = this.commandManager.runSync('git', [
       'diff',
-      base,
-      head,
+      ref,
       '--stat',
       '--ignore-all-space',
       '--ignore-blank-lines',
       extensionFilter
     ])
 
-    // @ts-ignore
     return changedFiles
-      .toString()
-      .split('\n\n')
-      .map((ln) => ln?.trim()?.split(' ')?.shift()) // ex: src/graphql/user.graphql | 2 ++
-      .filter(Boolean)
+        .toString()
+        .split('\n')
+        .map((ln) => {
+          const matchedText = ln.match(FILE_PATH_REGEX)
+          return matchedText?.shift() || ''
+        }) // ex: src/graphql/user.graphql | 2 ++
+        .filter(Boolean)
   }
 }
