@@ -41,6 +41,7 @@ class CommandManager implements ICommandManager {
       child.on('exit', (code) => {
 
         if (isDone) {
+          console.log('stdout.toString(): ', stdout.toString())
           resolve([stdout.toString()])
         }
 
