@@ -29,12 +29,17 @@ async function run(): Promise<void> {
   const gitCommandManager: GitCommandManager = new GitCommandManager(
     commandManager
   )
+
   await gitCommandManager.fetch()
   await gitCommandManager.checkout(currentBranch)
   const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   const currentBranchVersion = currentPkg.version
   core.debug(`currentBranchVersion: ${currentBranchVersion}`)
-  const changedFiles = await gitCommandManager.diffFiles()
+
+  const base = pullRequest?.base?.sha ?? context.payload.before
+  const head = pullRequest?.head?.sha ?? context.payload.after
+
+  const changedFiles = await gitCommandManager.diffFiles(base, head)
   core.info(`changedFiles:  ${changedFiles.join(', ')}`)
   console.log(`changedFiles: ${changedFiles.join(', ')}`)
 

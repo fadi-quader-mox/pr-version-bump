@@ -41,10 +41,11 @@ export class GitCommandManager {
     await this.commandManager.run('git', ['push', ref])
   }
 
-  diffFiles(): string[] {
+  diffFiles(base: string, head: string): string[] {
     const changedFiles = this.commandManager.runSync('git', [
       'diff',
-      '--name-only'
+      '--name-only',
+      `${base} ${head}`
       // '--ignore-all-space',
       // '--ignore-blank-lines'
     ])

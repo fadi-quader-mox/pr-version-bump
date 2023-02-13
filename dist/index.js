@@ -965,7 +965,7 @@ const constants_1 = __webpack_require__(32);
 const command_manager_1 = __webpack_require__(273);
 const git_command_manager_1 = __webpack_require__(289);
 function run() {
-    var _a, _b;
+    var _a, _b, _c, _d, _e, _f;
     return __awaiter(this, void 0, void 0, function* () {
         const GITHUB_TOKEN = core.getInput('GITHUB_TOKEN');
         const GITHUB_ACTOR = process.env.GITHUB_ACTOR || '';
@@ -986,13 +986,15 @@ function run() {
         const currentPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
         const currentBranchVersion = currentPkg.version;
         core.debug(`currentBranchVersion: ${currentBranchVersion}`);
-        const changedFiles = yield gitCommandManager.diffFiles();
+        const base = (_c = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base) === null || _b === void 0 ? void 0 : _b.sha) !== null && _c !== void 0 ? _c : context.payload.before;
+        const head = (_e = (_d = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _d === void 0 ? void 0 : _d.sha) !== null && _e !== void 0 ? _e : context.payload.after;
+        const changedFiles = yield gitCommandManager.diffFiles(base, head);
         core.info(`changedFiles:  ${changedFiles.join(', ')}`);
         console.log(`changedFiles: ${changedFiles.join(', ')}`);
         yield gitCommandManager.checkout(defaultBranch);
         const defaultBranchVersion = (0, utils_1.getCurrentVersion)();
         core.debug(`defaultBranchVersion: ${defaultBranchVersion}`);
-        const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
+        const labels = (_f = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _f !== void 0 ? _f : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
         if (!semverLabel) {
             if (currentBranchVersion > defaultBranchVersion) {
@@ -1280,10 +1282,11 @@ class GitCommandManager {
             yield this.commandManager.run('git', ['push', ref]);
         });
     }
-    diffFiles() {
+    diffFiles(base, head) {
         const changedFiles = this.commandManager.runSync('git', [
             'diff',
-            '--name-only'
+            '--name-only',
+            `${base} ${head}`
             // '--ignore-all-space',
             // '--ignore-blank-lines'
         ]);
