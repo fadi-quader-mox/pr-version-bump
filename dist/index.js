@@ -1167,12 +1167,14 @@ class CommandManager {
                         reject(error);
                     }
                 });
-                child.stderr.on('data', (chunk) => {
+                child.stderr.on('data', (chunk) => errorMessages.push(chunk));
+                child.stdout.on('data', chunk => {
                     console.log('chunk ', chunk);
-                    errorMessages.push(chunk);
                 });
                 child.on('exit', (code) => {
-                    if (isDone || code === 0) {
+                    if (isDone)
+                        return;
+                    if (code === 0) {
                         void resolve(errorMessages);
                     }
                     else {
