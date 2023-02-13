@@ -44,9 +44,9 @@ export class GitCommandManager {
   diffFiles(): string[] {
     const changedFiles = this.commandManager.runSync('git', [
       'diff',
-      '--name-only',
-      '--ignore-all-space',
-      '--ignore-blank-lines'
+      '--name-only'
+      // '--ignore-all-space',
+      // '--ignore-blank-lines'
     ])
     console.log('changedFiles ', changedFiles)
     return []
