@@ -30,10 +30,7 @@ class CommandManager implements ICommandManager {
       })
       child.stderr.on('data', (chunk) => errorMessages.push(chunk))
       child.on('exit', (code) => {
-
-        if (isDone) return
-
-        if (code === 0) {
+        if (isDone || code === 0) {
           void resolve(errorMessages)
         } else {
           core.error(`${command} ${args.join(', ')}`)
