@@ -1288,7 +1288,7 @@ class GitCommandManager {
             'diff',
             base,
             head,
-            '--numstat',
+            '--stat',
             '--ignore-all-space',
             '--ignore-blank-lines',
             extensionFilter
@@ -1296,8 +1296,12 @@ class GitCommandManager {
         // @ts-ignore
         return changedFiles
             .toString()
-            .split('\n')
-            .map((ln) => { var _a, _b; return (_b = (_a = ln === null || ln === void 0 ? void 0 : ln.split('       ')) === null || _a === void 0 ? void 0 : _a.pop()) === null || _b === void 0 ? void 0 : _b.trim(); })
+            .split('\n\n')
+            .map((ln) => {
+            var _a;
+            console.log('line: ', ln);
+            return (_a = ln === null || ln === void 0 ? void 0 : ln.split(' ')) === null || _a === void 0 ? void 0 : _a.shift();
+        })
             .filter(Boolean);
     }
 }

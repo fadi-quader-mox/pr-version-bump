@@ -48,7 +48,7 @@ export class GitCommandManager {
       'diff',
       base,
       head,
-      '--numstat',
+      '--stat',
       '--ignore-all-space',
       '--ignore-blank-lines',
       extensionFilter
@@ -57,8 +57,11 @@ export class GitCommandManager {
     // @ts-ignore
     return changedFiles
       .toString()
-      .split('\n')
-      .map((ln) => ln?.split('       ')?.pop()?.trim())
+      .split('\n\n')
+      .map((ln) => {
+        console.log('line: ', ln)
+        return ln?.split(' ')?.shift()
+      })
       .filter(Boolean)
   }
 }
