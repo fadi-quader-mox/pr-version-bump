@@ -28,7 +28,7 @@ class CommandManager implements ICommandManager {
           reject(error)
         }
       })
-      child.stderr.on('data', (chunk) => errorMessages.push(chunk))
+      child.stderr.on('data', (chunk) => errorMessages.push(chunk.toString()))
       child.stdout.on('data', chunk => {
         console.log('chunk ', chunk)
       })
