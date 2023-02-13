@@ -58,9 +58,7 @@ export class GitCommandManager {
     return changedFiles
       .toString()
       .split('\n\n')
-      .map((ln) => {
-        return ln?.trim()?.split(' ')?.shift()
-      })
+      .map((ln) => ln?.trim()?.split(' ')?.shift()) // ex: src/graphql/user.graphql | 2 ++
       .filter(Boolean)
   }
 }
