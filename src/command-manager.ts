@@ -1,9 +1,10 @@
 import * as core from '@actions/core'
 import {EOL} from 'os'
-import {spawn} from 'child_process'
+import {spawn, execSync} from 'child_process'
 
 export interface ICommandManager {
   run(command: string, args: string[]): Promise<any>
+  runSync(command: string, args: string[]): string | Buffer
 }
 
 export const createCommandManager = (workspace: string): ICommandManager => {
@@ -21,7 +22,6 @@ class CommandManager implements ICommandManager {
       const child = spawn(command, args, {cwd: this.workspace})
       let isDone = false
       const errorMessages: any[] = []
-      let stdout: Buffer = Buffer.alloc(0)
       child.on('error', (error) => {
         core.error(error)
         if (!isDone) {
@@ -29,20 +29,11 @@ class CommandManager implements ICommandManager {
           reject(error)
         }
       })
+
       child.stderr.on('data', (chunk) => errorMessages.push(chunk))
-      child.stdout.on('data', chunk => {
-        try {
-          stdout = Buffer.concat([
-              stdout,
-              chunk
-          ])
-        } catch (e) {}
-      })
       child.on('exit', (code) => {
-        console.log('stdout.toString(): ', stdout.toString())
-        if (isDone) {
-          resolve([stdout.toString()])
-        }
+
+        if (isDone) return
 
         if (code === 0) {
           void resolve(errorMessages)
@@ -55,5 +46,10 @@ class CommandManager implements ICommandManager {
         }
       })
     })
+  }
+
+  runSync(command, args): string {
+    const fullCommand = [command, ...(args || [])].join(' ')
+    return execSync(fullCommand, {encoding: 'utf8', timeout: 10000})
   }
 }

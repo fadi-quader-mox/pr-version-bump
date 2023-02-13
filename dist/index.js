@@ -1160,7 +1160,6 @@ class CommandManager {
                 const child = (0, child_process_1.spawn)(command, args, { cwd: this.workspace });
                 let isDone = false;
                 const errorMessages = [];
-                let stdout = Buffer.alloc(0);
                 child.on('error', (error) => {
                     core.error(error);
                     if (!isDone) {
@@ -1169,20 +1168,9 @@ class CommandManager {
                     }
                 });
                 child.stderr.on('data', (chunk) => errorMessages.push(chunk));
-                child.stdout.on('data', chunk => {
-                    try {
-                        stdout = Buffer.concat([
-                            stdout,
-                            chunk
-                        ]);
-                    }
-                    catch (e) { }
-                });
                 child.on('exit', (code) => {
-                    console.log('stdout.toString(): ', stdout.toString());
-                    if (isDone) {
-                        resolve([stdout.toString()]);
-                    }
+                    if (isDone)
+                        return;
                     if (code === 0) {
                         void resolve(errorMessages);
                     }
@@ -1194,6 +1182,10 @@ class CommandManager {
                 });
             });
         });
+    }
+    runSync(command, args) {
+        const fullCommand = [command, ...(args || [])].join(' ');
+        return (0, child_process_1.execSync)(fullCommand, { encoding: 'utf8', timeout: 10000 });
     }
 }
 
@@ -1289,15 +1281,14 @@ class GitCommandManager {
         });
     }
     diffFiles() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const changedFiles = yield this.commandManager.run('git', [
-                'diff',
-                '--name-only',
-                '--ignore-all-space',
-                '--ignore-blank-lines'
-            ]);
-            return changedFiles;
-        });
+        const changedFiles = this.commandManager.runSync('git', [
+            'diff',
+            '--name-only',
+            '--ignore-all-space',
+            '--ignore-blank-lines'
+        ]);
+        console.log('changedFiles ', changedFiles);
+        return [];
     }
 }
 exports.GitCommandManager = GitCommandManager;

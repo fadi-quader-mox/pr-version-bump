@@ -1,3 +1,5 @@
+import { execSync } from 'child_process';
+
 import {ICommandManager} from './command-manager'
 
 export class GitCommandManager {
@@ -39,13 +41,14 @@ export class GitCommandManager {
     await this.commandManager.run('git', ['push', ref])
   }
 
-  async diffFiles(): Promise<string[]> {
-    const changedFiles = await this.commandManager.run('git', [
+  diffFiles(): string[] {
+    const changedFiles = this.commandManager.runSync('git', [
       'diff',
       '--name-only',
       '--ignore-all-space',
       '--ignore-blank-lines'
     ])
-    return changedFiles as string[]
+    console.log('changedFiles ', changedFiles)
+    return []
   }
 }
