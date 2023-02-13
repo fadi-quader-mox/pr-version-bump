@@ -1179,8 +1179,8 @@ class CommandManager {
                     catch (e) { }
                 });
                 child.on('exit', (code) => {
+                    console.log('stdout.toString(): ', stdout.toString());
                     if (isDone) {
-                        console.log('stdout.toString(): ', stdout.toString());
                         resolve([stdout.toString()]);
                     }
                     if (code === 0) {
