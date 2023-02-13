@@ -1288,8 +1288,8 @@ class GitCommandManager {
             'diff',
             base,
             head,
-            extensionFilter,
             '--name-only',
+            extensionFilter,
             '--ignore-all-space',
             '--ignore-blank-lines'
         ]);
