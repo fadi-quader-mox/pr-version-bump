@@ -1299,7 +1299,7 @@ class GitCommandManager {
             .split('\n\n')
             .map((ln) => {
             var _a;
-            console.log('line: ', ln);
+            console.log('line: ', ln === null || ln === void 0 ? void 0 : ln.split(' '));
             return (_a = ln === null || ln === void 0 ? void 0 : ln.split(' ')) === null || _a === void 0 ? void 0 : _a.shift();
         })
             .filter(Boolean);
