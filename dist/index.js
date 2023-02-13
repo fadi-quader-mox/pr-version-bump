@@ -1289,9 +1289,9 @@ class GitCommandManager {
             base,
             head,
             '--name-only',
-            extensionFilter,
             '--ignore-all-space',
-            '--ignore-blank-lines'
+            '--ignore-blank-lines',
+            extensionFilter,
         ]);
         return changedFiles.toString().split('\n').filter(Boolean);
     }
