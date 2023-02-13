@@ -53,7 +53,9 @@ export class GitCommandManager {
       '--ignore-all-space',
       '--ignore-blank-lines'
     ])
+
     console.log('changedFiles ', changedFiles)
+
     return []
   }
 }
