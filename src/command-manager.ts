@@ -21,7 +21,7 @@ class CommandManager implements ICommandManager {
       const child = spawn(command, args, {cwd: this.workspace})
       let isDone = false
       const errorMessages: any[] = []
-      const output: string[] = []
+      let stdout: Buffer = Buffer.alloc(0)
       child.on('error', (error) => {
         core.error(error)
         if (!isDone) {
@@ -30,13 +30,18 @@ class CommandManager implements ICommandManager {
         }
       })
       child.stderr.on('data', (chunk) => errorMessages.push(chunk))
-      child.stdout.on('data', (chunk) => {
-        output.push(chunk.toString())
+      child.stdout.on('data', chunk => {
+        try {
+          stdout = Buffer.concat([
+              stdout,
+              chunk
+          ])
+        } catch (e) {}
       })
       child.on('exit', (code) => {
 
         if (isDone) {
-          resolve(output)
+          resolve([stdout.toString()])
         }
 
         if (code === 0) {

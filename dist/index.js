@@ -1160,7 +1160,7 @@ class CommandManager {
                 const child = (0, child_process_1.spawn)(command, args, { cwd: this.workspace });
                 let isDone = false;
                 const errorMessages = [];
-                const output = [];
+                let stdout = Buffer.alloc(0);
                 child.on('error', (error) => {
                     core.error(error);
                     if (!isDone) {
@@ -1169,12 +1169,18 @@ class CommandManager {
                     }
                 });
                 child.stderr.on('data', (chunk) => errorMessages.push(chunk));
-                child.stdout.on('data', (chunk) => {
-                    output.push(chunk.toString());
+                child.stdout.on('data', chunk => {
+                    try {
+                        stdout = Buffer.concat([
+                            stdout,
+                            chunk
+                        ]);
+                    }
+                    catch (e) { }
                 });
                 child.on('exit', (code) => {
                     if (isDone) {
-                        resolve(output);
+                        resolve([stdout.toString()]);
                     }
                     if (code === 0) {
                         void resolve(errorMessages);
