@@ -42,6 +42,7 @@ export class GitCommandManager {
   async diffFiles(): Promise<string[]> {
     const changedFiles = await this.commandManager.run('git', [
       'diff',
+      '--name-only',
       '--ignore-all-space',
       '--ignore-blank-lines'
     ])
