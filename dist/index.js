@@ -1007,6 +1007,9 @@ function run() {
             }
             return;
         }
+        if (changedFiles.length > 0 && semverLabel !== 'minor') {
+            core.setFailed(`❌ Please assign 'minor' label for GQL schema changes.`);
+        }
         const newVersion = (0, utils_1.generateNewVersion)(semverLabel);
         core.info(`Current version: ${currentBranchVersion}`);
         core.info(`New version: ${newVersion}`);

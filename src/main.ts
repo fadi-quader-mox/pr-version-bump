@@ -63,6 +63,9 @@ async function run(): Promise<void> {
     return
   }
 
+  if (changedFiles.length > 0 && semverLabel !== 'minor') {
+    core.setFailed(`❌ Please assign 'minor' label for GQL schema changes.`)
+  }
   const newVersion = generateNewVersion(semverLabel)
   core.info(`Current version: ${currentBranchVersion}`)
   core.info(`New version: ${newVersion}`)
