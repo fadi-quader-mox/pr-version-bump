@@ -986,12 +986,12 @@ function run() {
         const currentPkg = (yield (0, utils_1.getPackageJson)(GITHUB_WORKSPACE));
         const currentBranchVersion = currentPkg.version;
         core.debug(`currentBranchVersion: ${currentBranchVersion}`);
-        yield gitCommandManager.checkout(defaultBranch);
-        const defaultBranchVersion = (0, utils_1.getCurrentVersion)();
-        core.debug(`defaultBranchVersion: ${defaultBranchVersion}`);
         const changedFiles = yield gitCommandManager.diffFiles();
         core.info(`changedFiles:  ${changedFiles.join(', ')}`);
         console.log(`changedFiles: ${changedFiles.join(', ')}`);
+        yield gitCommandManager.checkout(defaultBranch);
+        const defaultBranchVersion = (0, utils_1.getCurrentVersion)();
+        core.debug(`defaultBranchVersion: ${defaultBranchVersion}`);
         const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
         if (!semverLabel) {
@@ -1168,7 +1168,7 @@ class CommandManager {
                     }
                 });
                 child.stderr.on('data', (chunk) => errorMessages.push(chunk));
-                child.on('data', chunk => {
+                child.stdout.on('data', chunk => {
                     console.log('chunk ', chunk.toString());
                 });
                 child.on('exit', (code) => {

@@ -34,13 +34,13 @@ async function run(): Promise<void> {
   const currentPkg = (await getPackageJson(GITHUB_WORKSPACE)) as any
   const currentBranchVersion = currentPkg.version
   core.debug(`currentBranchVersion: ${currentBranchVersion}`)
-  await gitCommandManager.checkout(defaultBranch)
-  const defaultBranchVersion = getCurrentVersion()
-  core.debug(`defaultBranchVersion: ${defaultBranchVersion}`)
   const changedFiles = await gitCommandManager.diffFiles()
   core.info(`changedFiles:  ${changedFiles.join(', ')}`)
   console.log(`changedFiles: ${changedFiles.join(', ')}`)
 
+  await gitCommandManager.checkout(defaultBranch)
+  const defaultBranchVersion = getCurrentVersion()
+  core.debug(`defaultBranchVersion: ${defaultBranchVersion}`)
   const labels: string[] =
     pullRequest?.labels.map((label) => label?.name.trim()) ?? []
   const semverLabel: string = getSemverLabel(labels)
