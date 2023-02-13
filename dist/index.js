@@ -989,6 +989,9 @@ function run() {
         yield gitCommandManager.checkout(defaultBranch);
         const defaultBranchVersion = (0, utils_1.getCurrentVersion)();
         core.debug(`defaultBranchVersion: ${defaultBranchVersion}`);
+        const changedFiles = yield gitCommandManager.diffFiles();
+        core.info(`changedFiles:  ${changedFiles.join(', ')}`);
+        console.log(`changedFiles: ${changedFiles.join(', ')}`);
         const labels = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.labels.map((label) => label === null || label === void 0 ? void 0 : label.name.trim())) !== null && _b !== void 0 ? _b : [];
         const semverLabel = (0, utils_1.getSemverLabel)(labels);
         if (!semverLabel) {
@@ -1166,10 +1169,8 @@ class CommandManager {
                 });
                 child.stderr.on('data', (chunk) => errorMessages.push(chunk));
                 child.on('exit', (code) => {
-                    if (isDone)
-                        return;
-                    if (code === 0) {
-                        void resolve(null);
+                    if (isDone || code === 0) {
+                        void resolve(errorMessages);
                     }
                     else {
                         core.error(`${command} ${args.join(', ')}`);
@@ -1271,6 +1272,16 @@ class GitCommandManager {
     push(ref) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.commandManager.run('git', ['push', ref]);
+        });
+    }
+    diffFiles() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const changedFiles = yield this.commandManager.run('git', [
+                'diff',
+                '--ignore-all-space',
+                '--ignore-blank-lines'
+            ]);
+            return changedFiles;
         });
     }
 }

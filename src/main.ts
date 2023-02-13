@@ -38,7 +38,7 @@ async function run(): Promise<void> {
   const defaultBranchVersion = getCurrentVersion()
   core.debug(`defaultBranchVersion: ${defaultBranchVersion}`)
   const changedFiles = await gitCommandManager.diffFiles()
-  core.info(`changedFiles`)
+  core.info(`changedFiles:  ${changedFiles.join(', ')}`)
   console.log(`changedFiles: ${changedFiles.join(', ')}`)
 
   const labels: string[] =
