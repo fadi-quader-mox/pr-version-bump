@@ -59,8 +59,7 @@ export class GitCommandManager {
       .toString()
       .split('\n\n')
       .map((ln) => {
-        console.log('line: ', ln?.split(' '))
-        return ln?.split(' ')?.shift()
+        return ln?.trim()?.split(' ')?.shift()
       })
       .filter(Boolean)
   }

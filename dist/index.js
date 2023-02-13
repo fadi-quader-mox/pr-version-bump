@@ -1298,9 +1298,8 @@ class GitCommandManager {
             .toString()
             .split('\n\n')
             .map((ln) => {
-            var _a;
-            console.log('line: ', ln === null || ln === void 0 ? void 0 : ln.split(' '));
-            return (_a = ln === null || ln === void 0 ? void 0 : ln.split(' ')) === null || _a === void 0 ? void 0 : _a.shift();
+            var _a, _b;
+            return (_b = (_a = ln === null || ln === void 0 ? void 0 : ln.trim()) === null || _a === void 0 ? void 0 : _a.split(' ')) === null || _b === void 0 ? void 0 : _b.shift();
         })
             .filter(Boolean);
     }
