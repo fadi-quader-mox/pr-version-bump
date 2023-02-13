@@ -58,7 +58,10 @@ export class GitCommandManager {
     return changedFiles
       .toString()
       .split('\n')
-      .map((ln) => ln?.split(' ')?.shift())
+      .map((ln) => {
+        console.log('line: ', ln)
+        return ln?.split(' ')?.shift()
+      })
       .filter(Boolean)
   }
 }
