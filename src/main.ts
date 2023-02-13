@@ -39,7 +39,7 @@ async function run(): Promise<void> {
   const base = pullRequest?.base?.sha ?? context.payload.before
   const head = pullRequest?.head?.sha ?? context.payload.after
 
-  const changedFiles = await gitCommandManager.diffFiles(base, head)
+  const changedFiles = gitCommandManager.diffFiles(base, head, 'graphql')
   core.info(`changedFiles:  ${changedFiles.join(', ')}`)
   console.log(`changedFiles: ${changedFiles.join(', ')}`)
 

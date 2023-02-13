@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import {execSync} from 'child_process'
 
 import {ICommandManager} from './command-manager'
 
@@ -52,8 +52,8 @@ export class GitCommandManager {
       '--name-only',
       '--ignore-all-space',
       '--ignore-blank-lines'
-    ]) || ''
+    ])
 
-    return changedFiles.toString().split('\n').filter(Boolean);
+    return changedFiles.toString().split('\n').filter(Boolean)
   }
 }

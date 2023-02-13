@@ -988,7 +988,7 @@ function run() {
         core.debug(`currentBranchVersion: ${currentBranchVersion}`);
         const base = (_c = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.base) === null || _b === void 0 ? void 0 : _b.sha) !== null && _c !== void 0 ? _c : context.payload.before;
         const head = (_e = (_d = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _d === void 0 ? void 0 : _d.sha) !== null && _e !== void 0 ? _e : context.payload.after;
-        const changedFiles = yield gitCommandManager.diffFiles(base, head);
+        const changedFiles = gitCommandManager.diffFiles(base, head, 'graphql');
         core.info(`changedFiles:  ${changedFiles.join(', ')}`);
         console.log(`changedFiles: ${changedFiles.join(', ')}`);
         yield gitCommandManager.checkout(defaultBranch);
@@ -1292,7 +1292,7 @@ class GitCommandManager {
             '--name-only',
             '--ignore-all-space',
             '--ignore-blank-lines'
-        ]) || '';
+        ]);
         return changedFiles.toString().split('\n').filter(Boolean);
     }
 }
