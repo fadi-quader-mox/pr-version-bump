@@ -1184,8 +1184,8 @@ class CommandManager {
         });
     }
     runSync(command, args) {
-        const fullCommand = [command, ...(args || [])].join(' ');
-        return (0, child_process_1.execSync)(fullCommand, { encoding: 'utf8', timeout: 10000 });
+        const fullCommand = [command, ...args].join(' ');
+        return (0, child_process_1.execSync)(fullCommand, { encoding: 'utf8', timeout: 10000 }).toString();
     }
 }
 

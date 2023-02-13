@@ -49,7 +49,7 @@ class CommandManager implements ICommandManager {
   }
 
   runSync(command, args): string {
-    const fullCommand = [command, ...(args || [])].join(' ')
-    return execSync(fullCommand, {encoding: 'utf8', timeout: 10000})
+    const fullCommand = [command, ...args].join(' ')
+    return execSync(fullCommand, {encoding: 'utf8', timeout: 10000}).toString()
   }
 }
