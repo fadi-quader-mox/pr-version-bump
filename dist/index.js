@@ -1288,10 +1288,10 @@ class GitCommandManager {
             'diff',
             base,
             head,
-            '--name-only',
+            '--stat',
             '--ignore-all-space',
             '--ignore-blank-lines',
-            extensionFilter,
+            extensionFilter
         ]);
         return changedFiles.toString().split('\n').filter(Boolean);
     }
