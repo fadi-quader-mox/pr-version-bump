@@ -54,6 +54,11 @@ export class GitCommandManager {
       extensionFilter
     ])
 
-    return changedFiles.toString().split('\n').filter(Boolean)
+    // @ts-ignore
+    return changedFiles
+      .toString()
+      .split('\n')
+      .map((ln) => ln?.split(' ')?.shift())
+      .filter(Boolean)
   }
 }

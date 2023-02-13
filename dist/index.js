@@ -1293,7 +1293,12 @@ class GitCommandManager {
             '--ignore-blank-lines',
             extensionFilter
         ]);
-        return changedFiles.toString().split('\n').filter(Boolean);
+        // @ts-ignore
+        return changedFiles
+            .toString()
+            .split('\n')
+            .map((ln) => { var _a; return (_a = ln === null || ln === void 0 ? void 0 : ln.split(' ')) === null || _a === void 0 ? void 0 : _a.shift(); })
+            .filter(Boolean);
     }
 }
 exports.GitCommandManager = GitCommandManager;
