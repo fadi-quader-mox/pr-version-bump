@@ -1167,9 +1167,9 @@ class CommandManager {
                         reject(error);
                     }
                 });
-                child.stderr.on('data', (chunk) => errorMessages.push(chunk.toString()));
+                child.stderr.on('data', (chunk) => errorMessages.push(chunk));
                 child.stdout.on('data', chunk => {
-                    console.log('chunk ', chunk);
+                    console.log('chunk ', chunk.toString());
                 });
                 child.on('exit', (code) => {
                     if (isDone)
