@@ -29,7 +29,7 @@ class CommandManager implements ICommandManager {
         }
       })
       child.stderr.on('data', (chunk) => errorMessages.push(chunk))
-      child.stdout.on('data', chunk => {
+      child.on('data', chunk => {
         console.log('chunk ', chunk.toString())
       })
       child.on('exit', (code) => {
