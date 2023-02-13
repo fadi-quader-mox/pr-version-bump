@@ -41,7 +41,7 @@ export class GitCommandManager {
     await this.commandManager.run('git', ['push', ref])
   }
 
-  changedFiles(base: string, head: string, extension: string): string[] {
+  changedFiles(base: string, head: string, extension?: string): string[] {
     const extensionFilter = extension ? `-- '***.${extension}'` : '';
 
     const changedFiles = this.commandManager.runSync('git', [
