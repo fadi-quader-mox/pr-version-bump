@@ -1160,6 +1160,7 @@ class CommandManager {
                 const child = (0, child_process_1.spawn)(command, args, { cwd: this.workspace });
                 let isDone = false;
                 const errorMessages = [];
+                const output = [];
                 child.on('error', (error) => {
                     core.error(error);
                     if (!isDone) {
@@ -1169,11 +1170,12 @@ class CommandManager {
                 });
                 child.stderr.on('data', (chunk) => errorMessages.push(chunk));
                 child.stdout.on('data', (chunk) => {
-                    console.log('chunk ', chunk.toString());
+                    output.push(chunk.toString());
                 });
                 child.on('exit', (code) => {
-                    if (isDone)
-                        return;
+                    if (isDone) {
+                        resolve(output);
+                    }
                     if (code === 0) {
                         void resolve(errorMessages);
                     }
