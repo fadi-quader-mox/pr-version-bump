@@ -41,13 +41,17 @@ export class GitCommandManager {
     await this.commandManager.run('git', ['push', ref])
   }
 
-  diffFiles(base: string, head: string): string[] {
+  changedFiles(base: string, head: string, extension: string): string[] {
+    const extensionFilter = extension ? `-- '***.${extension}'` : '';
+
     const changedFiles = this.commandManager.runSync('git', [
       'diff',
+      base,
+      head,
+      extensionFilter,
       '--name-only',
-      `${base} ${head}`
-      // '--ignore-all-space',
-      // '--ignore-blank-lines'
+      '--ignore-all-space',
+      '--ignore-blank-lines'
     ])
     console.log('changedFiles ', changedFiles)
     return []
