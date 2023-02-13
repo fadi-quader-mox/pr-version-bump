@@ -52,10 +52,8 @@ export class GitCommandManager {
       '--name-only',
       '--ignore-all-space',
       '--ignore-blank-lines'
-    ])
+    ]) || ''
 
-    console.log('changedFiles ', changedFiles)
-
-    return []
+    return changedFiles.toString().split('\n').filter(Boolean);
   }
 }
