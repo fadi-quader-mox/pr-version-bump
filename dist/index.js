@@ -1282,13 +1282,16 @@ class GitCommandManager {
             yield this.commandManager.run('git', ['push', ref]);
         });
     }
-    diffFiles(base, head) {
+    diffFiles(base, head, extension) {
+        const extensionFilter = extension ? `-- '***.${extension}'` : '';
         const changedFiles = this.commandManager.runSync('git', [
             'diff',
+            base,
+            head,
+            extensionFilter,
             '--name-only',
-            `${base} ${head}`
-            // '--ignore-all-space',
-            // '--ignore-blank-lines'
+            '--ignore-all-space',
+            '--ignore-blank-lines'
         ]);
         console.log('changedFiles ', changedFiles);
         return [];
