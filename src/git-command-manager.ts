@@ -15,8 +15,8 @@ export class GitCommandManager {
   }
 
   async setGithubUsernameAndPassword(
-      username: string,
-      email?: string
+    username: string,
+    email?: string
   ): Promise<void> {
     const ghEmail = email || `${username}@users.noreply.github.com`
 
@@ -56,12 +56,12 @@ export class GitCommandManager {
     ])
 
     return changedFiles
-        .toString()
-        .split('\n')
-        .map((ln) => {
-          const matchedText = ln.match(FILE_PATH_REGEX)
-          return matchedText?.shift() || ''
-        }) // ex: src/graphql/user.graphql | 2 ++
-        .filter(Boolean)
+      .toString()
+      .split('\n')
+      .map((ln) => {
+        const matchedText = ln.match(FILE_PATH_REGEX)
+        return matchedText?.shift() || ''
+      }) // ex: src/graphql/user.graphql | 2 ++
+      .filter(Boolean)
   }
 }

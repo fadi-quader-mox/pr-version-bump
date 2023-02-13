@@ -1,5 +1,6 @@
-type Customer {
+type People {
   id: ID!
   name: String
   age: Int
+
 }
