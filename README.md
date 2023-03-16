@@ -18,6 +18,7 @@ This action is useful when the version **can not** be automatically bumped after
 ### Outputs
 * **NEXT_VERSION**: The newly bumped version
 
+
 ## Usage
 ```yaml
 - name: Pull Request Semver Action
