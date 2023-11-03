@@ -76,6 +76,7 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     permissions:
+      contents: write
       issues: write
       pull-requests: write
     steps:
@@ -86,7 +87,7 @@ jobs:
           count: 1
           labels: "major, minor, patch"
           add_comment: true
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Bump version
         uses: fadi-quader-mox/pr-version-bump@v1.0.0
         with:
