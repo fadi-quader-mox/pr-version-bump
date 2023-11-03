@@ -46,7 +46,7 @@ jobs:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Bump version
         uses: fadi-quader-mox/pr-version-bump@v1.0.0
         with:
