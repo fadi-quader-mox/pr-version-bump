@@ -52,3 +52,46 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+#### Full example to bump version and require one label on PR
+
+```yaml
+name: PR Version Bump
+on:
+  pull_request_target:
+    types:
+      - synchronize
+      - opened
+      - reopened
+      - edited
+      - ready_for_review
+      - labeled
+      - unlabeled
+
+jobs:
+  check_label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+      - id: check-labels
+        uses: mheap/github-action-required-labels@v5
+        with:
+          mode: exactly
+          count: 1
+          labels: "major, minor, patch"
+          add_comment: true
+  version_bump:
+    needs: check_label
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Bump version
+        uses: fadi-quader-mox/pr-version-bump@v1.0.0
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
