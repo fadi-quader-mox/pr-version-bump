@@ -25,11 +25,11 @@ This action is useful when the version **can not** be automatically bumped after
   with:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
-It's recommend to use this action with [`styfle/cancel-workflow-action@0.10.0`](https://github.com/marketplace/actions/cancel-workflow-action) to cancel previous running actions in order to avoid confliciting actions
+It's recommended to specify the [`concurrency`](https://docs.github.com/en/actions/using-jobs/using-concurrency) property to cancel previously invoked actions in order to avoid conflicting changes.
 
 #### Full example
 ```yaml
-name: 'Bump Version'
+name: PR Version Bump
 on:
   pull_request_target:
     types:
@@ -40,15 +40,55 @@ on:
       - reopened
 
 jobs:
-  test:
+  version_bump:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.10.0
+      - uses: actions/checkout@v3
+      - name: Bump version
+        uses: fadi-quader-mox/pr-version-bump@v1.0.0
         with:
-          access_token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: 'actions/checkout@v3'
-      - name: Pull Request Version Bump
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+#### Full example to bump version and require one label on PR
+
+```yaml
+name: PR Version Bump
+on:
+  pull_request_target:
+    types:
+      - synchronize
+      - opened
+      - reopened
+      - edited
+      - ready_for_review
+      - labeled
+      - unlabeled
+
+jobs:
+  version_bump:
+    name: Bump version
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Check labels
+        uses: mheap/github-action-required-labels@v5
+        with:
+          mode: exactly
+          count: 1
+          labels: "major, minor, patch"
+          add_comment: true
+      - uses: actions/checkout@v4
+      - name: Bump version
         uses: fadi-quader-mox/pr-version-bump@v1.0.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
