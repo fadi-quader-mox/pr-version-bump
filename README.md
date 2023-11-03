@@ -69,26 +69,23 @@ on:
       - unlabeled
 
 jobs:
-  check_label:
+  version_bump:
+    name: Bump version
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     permissions:
       issues: write
       pull-requests: write
     steps:
-      - id: check-labels
+      - name: Check labels
         uses: mheap/github-action-required-labels@v5
         with:
           mode: exactly
           count: 1
           labels: "major, minor, patch"
           add_comment: true
-  version_bump:
-    needs: check_label
-    runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
-    steps:
       - uses: actions/checkout@v3
       - name: Bump version
         uses: fadi-quader-mox/pr-version-bump@v1.0.0
